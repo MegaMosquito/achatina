@@ -1,3 +1,5 @@
+.hzn.json.tmp.mk
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
