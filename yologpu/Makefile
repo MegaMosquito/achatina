@@ -1,4 +1,4 @@
-# A simple Makefile for the achatina YOLOv3 GPU example
+# A simple Makefile for the achatina YOLO GPU example
 
 help:
 	@echo "Please see the \"README.md\" file for instructions."
@@ -22,10 +22,10 @@ test:
 	@echo "  NOTE: Building and starting the shared services..."
 	make -C ../shared test
 	@echo "  NOTE: Building and starting the local services..."
-	make -C restyolov3gpu
-	make -C restyolov3gpu test
-	make -C yv3g
-	make -C yv3g test
+	make -C restyologpu
+	make -C restyologpu test
+	make -C yologpu
+	make -C yologpu test
 
 publish-services:
 	@echo "Building and publishing the local services..."
@@ -38,12 +38,12 @@ publish-services:
 	  else echo "  NOTE: Using Exchange Org ID: \"${HZN_ORG_ID}\""; \
 	fi
 	@sleep 2
-	make -C restyolov3gpu
-	make -C restyolov3gpu push
-	make -C restyolov3gpu publish-service
-	make -C yv3g
-	make -C yv3g push
-	make -C yv3g publish-service
+	make -C restyologpu
+	make -C restyologpu push
+	make -C restyologpu publish-service
+	make -C yologpu
+	make -C yologpu push
+	make -C yologpu publish-service
 	@echo "  NOTE: the shared services must also be published (restcam, mqtt, monitor)."
 	@echo "  NOTE: after this, also please publish a pattern or policies."
 
@@ -53,14 +53,14 @@ publish-pattern:
           then { echo "***** ERROR: \"DOCKERHUB_ID\" is not set!"; exit 1; }; \
           else echo "  NOTE: Using DockerHubID: \"${DOCKERHUB_ID}\""; \
         fi
-	hzn exchange pattern publish -f patterns/pattern-yv3.json
+	hzn exchange pattern publish -f patterns/pattern-yolo-gpu.json
 
 register:
-	hzn register --pattern "${HZN_ORG_ID}/pattern-yv3" --input-file ./input.json
+	hzn register --pattern "${HZN_ORG_ID}/pattern-yolo-gpu" --input-file ./input.json
 
 clean:
-	make -C restyolov3gpu clean
-	make -C yv3g clean
+	make -C restyologpu clean
+	make -C yologpu clean
 
 deep-clean:
 	-docker rm -f `docker ps -aq` 2>/dev/null || :
