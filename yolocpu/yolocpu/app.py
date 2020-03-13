@@ -64,48 +64,51 @@ LOG_ALL = False
 
 if __name__ == '__main__':
   while True:
+    try:
+      # Request one run from the yolo REST service...
+      if LOG_ALL:
+        print('\nInitiating a request...')
+        print('--> URL: ' + YOLO_URL)
+      r = requests.get(YOLO_URL)
+      if (r.status_code > 299):
+          print('ERROR: Yolo request failed: ' + str(r.status_code))
+          time.sleep(10)
+          continue
+      if LOG_ALL: print('Successful response received!')
+      j = r.json()
+      if LOG_ALL or LOG_STATS:
+        d = datetime.fromtimestamp(j['detect']['date']).strftime('%Y-%m-%d %H:%M:%S')
+        print('Date: %s, Cam: %0.2f sec, YoloV3: %0.2f msec.' % (d, j['detect']['camtime'], j['detect']['time'] * 1000.0))
 
-    # Request one run from the yolo REST service...
-    if LOG_ALL:
-      print('\nInitiating a request...')
-      print('--> URL: ' + YOLO_URL)
-    r = requests.get(YOLO_URL)
-    if (r.status_code > 299):
-        print('ERROR: Yolo request failed: ' + str(r.status_code))
-        time.sleep(10)
-        continue
-    if LOG_ALL: print('Successful response received!')
-    j = r.json()
-    if LOG_ALL or LOG_STATS:
-      d = datetime.fromtimestamp(j['detect']['date']).strftime('%Y-%m-%d %H:%M:%S')
-      print('Date: %s, Cam: %0.2f sec, YoloV3: %0.2f msec.' % (d, j['detect']['camtime'], j['detect']['time'] * 1000.0))
+      # Add info into the JSON about this example
+      j['source'] = EXAMPLE_TITLE
+      j['source-url'] = EXAMPLE_URL
 
-    # Add info into the JSON about this example
-    j['source'] = EXAMPLE_TITLE
-    j['source-url'] = EXAMPLE_URL
+      # Push JSON to a file (so we can publish it, since it overflows the CLI)
+      with open(TEMP_FILE, 'w') as temp_file:
+        json.dump(j, temp_file)
 
-    # Push JSON to a file (so we can publish it, since it overflows the CLI)
-    with open(TEMP_FILE, 'w') as temp_file:
-      json.dump(j, temp_file)
-
-    # Publish to kafka
-    if '' != KAFKA_PUB_COMMAND:
-      if LOG_ALL: print('--> Kafka: ' + KAFKA_PUB_COMMAND + TEMP_FILE)
-      discard = subprocess.run(KAFKA_PUB_COMMAND + TEMP_FILE, shell=True)
-    else:
-      if LOG_ALL: print('--> Kafka: *** PUBLICATION DISABLED **')
-
-    # (Optionally) publish to the debug topic (with subscribe info if approp)
-    if '' != MQTT_PUB_TOPIC:
-      # Did we publish this stuff to kafka?
+      # Publish to kafka
       if '' != KAFKA_PUB_COMMAND:
-        # Provide info to the caller about how to subscribe to this kafka stream
-        j['kafka-sub'] = 'kafkacat -C -b ' + EVENTSTREAMS_BROKER_URLS + ' -X api.version.request=true -X security.protocol=sasl_ssl -X sasl.mechanisms=PLAIN -X sasl.username=token -X sasl.password="' + EVENTSTREAMS_API_KEY + '" -t ' + EVENTSTREAMS_PUB_TOPIC
-        # Rewrite the file with the updated JSON
-        with open(TEMP_FILE, 'w') as temp_file:
-          json.dump(j, temp_file)
-      if LOG_ALL: print('--> MQTT: ' + DEBUG_PUB_COMMAND + TEMP_FILE)
-      discard = subprocess.run(DEBUG_PUB_COMMAND + TEMP_FILE, shell=True)
+        if LOG_ALL: print('--> Kafka: ' + KAFKA_PUB_COMMAND + TEMP_FILE)
+        discard = subprocess.run(KAFKA_PUB_COMMAND + TEMP_FILE, shell=True)
+      else:
+        if LOG_ALL: print('--> Kafka: *** PUBLICATION DISABLED **')
+
+      # (Optionally) publish to the debug topic (with subscribe info if approp)
+      if '' != MQTT_PUB_TOPIC:
+        # Did we publish this stuff to kafka?
+        if '' != KAFKA_PUB_COMMAND:
+          # Provide info to the caller about how to subscribe to this kafka stream
+          j['kafka-sub'] = 'kafkacat -C -b ' + EVENTSTREAMS_BROKER_URLS + ' -X api.version.request=true -X security.protocol=sasl_ssl -X sasl.mechanisms=PLAIN -X sasl.username=token -X sasl.password="' + EVENTSTREAMS_API_KEY + '" -t ' + EVENTSTREAMS_PUB_TOPIC
+          # Rewrite the file with the updated JSON
+          with open(TEMP_FILE, 'w') as temp_file:
+            json.dump(j, temp_file)
+        if LOG_ALL: print('--> MQTT: ' + DEBUG_PUB_COMMAND + TEMP_FILE)
+        discard = subprocess.run(DEBUG_PUB_COMMAND + TEMP_FILE, shell=True)
+
+    except:
+      pass
 
     # Pause briefly (to not hog the CPU too much)
     if LOG_ALL: print('Sleeping for ' + str(SLEEP_BETWEEN_CALLS) + ' seconds...')
