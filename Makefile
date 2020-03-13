@@ -3,7 +3,7 @@
 help:
 	@echo "Please see the \"README.md\" file for instructions."
 
-test: test-yv3g
+test: test-yologpu
 
 test-shared-services:
 	@echo "Building all of the shared services..."
@@ -13,13 +13,13 @@ publish-services:
 	@echo "Building and publishing the shared services..."
 	make -C shared publish-services
 	@echo "Building and publishing all the services..."
-	make -C yv3g publish-services
-	make -C yv3c publish-services
+	make -C yologpu publish-services
+	make -C yolocpu publish-services
 
 clean:
 	make -C shared clean
-	make -C yv3g clean
-	make -C yv3c clean
+	make -C yologpu clean
+	make -C yolocpu clean
 
 deep-clean:
 	-docker rm -f `docker ps -aq` 2>/dev/null || :
@@ -29,20 +29,20 @@ deep-clean:
 .PHONY: help test test-shared-services publish-services clean deep-clean
 
 # YOLOv3 for GPU
-test-yv3g: test-shared-services
+test-yologpu: test-shared-services
 	@echo "Performing  local test (outside of Horizon) for YOLOv3 (GPU)..."
-	make -C yv3g test
-register-yv3g:
-	make -C yv3g register
-.PHONY: test-yv3g register-yv3g
+	make -C yologpu test
+register-yologpu:
+	make -C yologpu register
+.PHONY: test-yologpu register-yologpu
 
 # YOLOv3 for CPU
-test-yv3c: test-shared-services
+test-yolocpu: test-shared-services
 	@echo "Performing  local test (outside of Horizon) for YOLOv3 (CPU)..."
-	make -C yv3c test
-register-yv3c:
-	make -C yv3c register
-.PHONY: test-yv3c register-yv3c
+	make -C yolocpu test
+register-yolocpu:
+	make -C yolocpu register
+.PHONY: test-yolocpu register-yolocpu
 
 
 

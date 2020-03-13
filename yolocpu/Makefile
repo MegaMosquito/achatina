@@ -22,10 +22,10 @@ test:
 	@echo "  NOTE: Building and starting the shared services..."
 	make -C ../shared test
 	@echo "  NOTE: Building and starting the local services..."
-	make -C restyolov3cpu
-	make -C restyolov3cpu test
-	make -C yv3c
-	make -C yv3c test
+	make -C restyolocpu
+	make -C restyolocpu test
+	make -C yolocpu
+	make -C yolocpu test
 
 publish-services:
 	@echo "Building and publishing the local services..."
@@ -38,12 +38,12 @@ publish-services:
 	  else echo "  NOTE: Using Exchange Org ID: \"${HZN_ORG_ID}\""; \
 	fi
 	@sleep 2
-	make -C restyolov3cpu
-	make -C restyolov3cpu push
-	make -C restyolov3cpu publish-service
-	make -C yv3c
-	make -C yv3c push
-	make -C yv3c publish-service
+	make -C restyolocpu
+	make -C restyolocpu push
+	make -C restyolocpu publish-service
+	make -C yolocpu
+	make -C yolocpu push
+	make -C yolocpu publish-service
 	@echo "  NOTE: the shared services must also be published (restcam, mqtt, monitor)."
 	@echo "  NOTE: after this, also please publish a pattern or policies."
 
@@ -59,8 +59,8 @@ register:
 	hzn register --pattern "${HZN_ORG_ID}/pattern-yv3" --input-file ./input.json
 
 clean:
-	make -C restyolov3cpu clean
-	make -C yv3c clean
+	make -C restyolocpu clean
+	make -C yolocpu clean
 
 deep-clean:
 	-docker rm -f `docker ps -aq` 2>/dev/null || :

@@ -1,12 +1,12 @@
 #
-# The pump that calls the yolov3 REST API, then pushes the results to kafka.
+# The pump that calls the yolo REST API, then pushes the results to kafka.
 # It can also (optionally) push the data to the local MQTT for debug purposes).
 #
 # Written by Glen Darling, March 2020.
 #
 
-EXAMPLE_TITLE = 'YOLOv3 Tiny (COCO) -- for CPU'
-EXAMPLE_URL = 'https://github.com/MegaMosquito/achatina/yv3c'
+EXAMPLE_TITLE = 'YOLO Tiny (COCO) -- for CPU'
+EXAMPLE_URL = 'https://github.com/MegaMosquito/achatina/yolocpu'
 
 import json
 import os
@@ -48,8 +48,8 @@ if '' == CAM_URL:
 #print('CAM_URL = "' + CAM_URL + '"')
 
 # Additional configuration constants
-TEMP_FILE = '/tmp/yolov3.json'
-YOLO_URL = 'http://restyolov3cpu:80/detect?kind=jpg&url=' + urllib.parse.quote(CAM_URL)
+TEMP_FILE = '/tmp/yolo.json'
+YOLO_URL = 'http://restyolocpu:80/detect?kind=jpg&url=' + urllib.parse.quote(CAM_URL)
 MQTT_PUB_COMMAND = 'mosquitto_pub -h mqtt -p 1883'
 DEBUG_PUB_COMMAND = MQTT_PUB_COMMAND + ' -t ' + MQTT_PUB_TOPIC + ' -f '
 if '' != EVENTSTREAMS_BROKER_URLS and '' != EVENTSTREAMS_API_KEY and '' != EVENTSTREAMS_PUB_TOPIC:
@@ -65,7 +65,7 @@ LOG_ALL = False
 if __name__ == '__main__':
   while True:
 
-    # Request one run from the yolov3 service...
+    # Request one run from the yolo REST service...
     if LOG_ALL:
       print('\nInitiating a request...')
       print('--> URL: ' + YOLO_URL)
