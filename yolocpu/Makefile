@@ -1,4 +1,4 @@
-# A simple Makefile for the achatina YOLOv3 GPU example
+# A simple Makefile for the achatina YOLO CPU example
 
 help:
 	@echo "Please see the \"README.md\" file for instructions."
@@ -53,10 +53,10 @@ publish-pattern:
           then { echo "***** ERROR: \"DOCKERHUB_ID\" is not set!"; exit 1; }; \
           else echo "  NOTE: Using DockerHubID: \"${DOCKERHUB_ID}\""; \
         fi
-	hzn exchange pattern publish -f patterns/pattern-yv3.json
+	hzn exchange pattern publish -f patterns/pattern-yolo-cpu.json
 
 register:
-	hzn register --pattern "${HZN_ORG_ID}/pattern-yv3" --input-file ./input.json
+	hzn register --pattern "${HZN_ORG_ID}/pattern-yolo-cpu" --input-file ./input.json
 
 clean:
 	make -C restyolocpu clean

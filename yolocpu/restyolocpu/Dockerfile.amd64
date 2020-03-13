@@ -1,7 +1,7 @@
 FROM ubuntu:bionic
 
 # Install build tools
-RUN apt-get update && apt-get install -y --no-install-recommends git make g++ python-pip python-setuptools python-dev zlib1g-dev libjpeg-dev wget curl jq
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates git make g++ python-pip python-setuptools python-dev zlib1g-dev libjpeg-dev wget curl jq
 
 # Required libraries
 RUN pip install wheel
@@ -15,8 +15,8 @@ RUN make
 
 # Get YOLO cfg and weights files
 WORKDIR /darknet
-RUN curl -sSL https://raw.githubusercontent.com/pjreddie/darknet/master/cfg/yolov3-tiny.cfg > yolo-tiny.cfg
-RUN curl -sSL https://pjreddie.com/media/files/yolov3-tiny.weights > yolo-tiny.weights
+RUN wget -O yolo-tiny.cfg https://raw.githubusercontent.com/pjreddie/darknet/master/cfg/yolov2-tiny.cfg 
+RUN wget -O yolo-tiny.weights https://pjreddie.com/media/files/yolov2-tiny.weights
 
 # Copy over the logo(s)
 COPY o-h.png /

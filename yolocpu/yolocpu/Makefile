@@ -1,4 +1,4 @@
-# A driver that calls the yolov3 detector, and pushed data to both mqtt and kafka
+# A driver that calls the yolo detector, and pushes data to mqtt and kafka
 
 # ----------------------------------------------------------------------------
 
@@ -37,7 +37,7 @@ check_id:
         fi
 
 HOST_INTERFACE:=$(word 5, $(shell sh -c "ip route | grep default | head -1"))
-HOST_IP_ADDRESS:= $(shell sh -c "ip addr | egrep -A 3 ${HOST_INTERFACE} | grep '    inet ' | sed 's/^    inet //;s|/.*||'")
+HOST_IP_ADDRESS:= $(shell sh -c "ip addr | egrep -A 3 'inet .*${HOST_INTERFACE}' | head -1 | grep '    inet ' | sed 's/^    inet //;s|/.*||'")
 dev: check_id
 	@if [ -z "${CAM_URL}" ]; \
           then echo "  Warning: \"CAM_URL\" is not set! Using default."; \
