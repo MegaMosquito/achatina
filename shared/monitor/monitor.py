@@ -88,7 +88,7 @@ if __name__ == '__main__':
       '   <div>\n' + \
       '   <table>\n' + \
       '     <tr>\n' + \
-      '       <th><h2>' + s + '</h2></th>\n' + \
+      '       <th><h2 style="color:blue;">' + s + '</h2></th>\n' + \
       '     </tr>\n' + \
       '     <tr>\n' + \
       '       <th>Device ID: ' + n + '</th>\n' + \
@@ -107,7 +107,7 @@ if __name__ == '__main__':
       '       <td> &nbsp; Camera time: <span id="camtime">' + str(ct) + '</span> seconds.</td>\n' + \
       '     </tr>\n' + \
       '     <tr>\n' + \
-      '       <td> &nbsp; Inferencing time: <span id="inftime">' + str(it) + '</span> seconds.</td>\n' + \
+      '       <td> &nbsp; Inferencing time: <span id="inftime" style="font-weight:bold;color:blue;">' + str(it) + '</span> seconds.</td>\n' + \
       '     </tr>\n' + \
       '     <tr><td> &nbsp; </td></tr>\n' + \
       '     <tr>\n' + \
