@@ -139,7 +139,9 @@ Each of the examples has its own README.md with additional details.
 
 ## Open-Horizon
 
-These examples have been designed with [Open-Horizon](https://github.com/open-horizon) in mind. By publishing them to ayour Open-Horizon exchange you can with a flick of your wrist deploy these applications to 10,000 or more devices, securely, and have them automatically monitired, updated with new versions, etc. If you want to manage edge devices at scale, there's really nothing else like it out there. And yeah, I'm biased. I have been using Open-Horizon and previous versions of this software since 2015, and I'm an employee of IBM, whose commercial IBM Edge Application Manager (TM) product is based on Open-Horizon.
+These examples have been designed with [Open-Horizon](https://github.com/open-horizon) in mind. Open-Horizon is a sub-project of [EdgeX Foundry](https://wiki.edgexfoundry.org/display/FA/Open+Horizon+-+EdgeX+Project+Group) which in turn is part of the Linux Foundation's [LF Edge](https://www.lfedge.org/projects/edgexfoundry/) project.
+
+By publishing the achatina examples to your Open-Horizon exchange you can with a flick of your wrist deploy these applications to 10,000 or more devices, securely, and have them automatically monitored, updated with new versions, etc. If you want to manage edge devices at scale, there's really nothing else like it out there. And yeah, I'm biased. I have been using Open-Horizon and previous versions of this software since 2015, and I'm an employee of IBM, whose commercial IBM Edge Application Manager (TM) product is based on Open-Horizon.
 
 ### Build and Publish to Open-Horizon
 
