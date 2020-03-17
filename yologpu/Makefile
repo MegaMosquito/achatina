@@ -22,10 +22,10 @@ test:
 	@echo "  NOTE: Building and starting the shared services..."
 	make -C ../shared test
 	@echo "  NOTE: Building and starting the local services..."
-	make -C restyologpu
-	make -C restyologpu test
-	make -C yologpu
-	make -C yologpu test
+	make -C restyolocuda
+	make -C restyolocuda test
+	make -C yolocuda
+	make -C yolocuda test
 
 publish-services:
 	@echo "Building and publishing the local services..."
@@ -38,12 +38,12 @@ publish-services:
 	  else echo "  NOTE: Using Exchange Org ID: \"${HZN_ORG_ID}\""; \
 	fi
 	@sleep 2
-	make -C restyologpu
-	make -C restyologpu push
-	make -C restyologpu publish-service
-	make -C yologpu
-	make -C yologpu push
-	make -C yologpu publish-service
+	make -C restyolocuda
+	make -C restyolocuda push
+	make -C restyolocuda publish-service
+	make -C yolocuda
+	make -C yolocuda push
+	make -C yolocuda publish-service
 	@echo "  NOTE: the shared services must also be published (restcam, mqtt, monitor)."
 	@echo "  NOTE: after this, also please publish a pattern or policies."
 
@@ -53,14 +53,14 @@ publish-pattern:
           then { echo "***** ERROR: \"DOCKERHUB_ID\" is not set!"; exit 1; }; \
           else echo "  NOTE: Using DockerHubID: \"${DOCKERHUB_ID}\""; \
         fi
-	hzn exchange pattern publish -f patterns/pattern-yolo-gpu.json
+	hzn exchange pattern publish -f patterns/pattern-yolo-cuda.json
 
 register:
-	hzn register --pattern "${HZN_ORG_ID}/pattern-yolo-gpu" --input-file ./input.json
+	hzn register --pattern "${HZN_ORG_ID}/pattern-yolo-cuda" --input-file ./input.json
 
 clean:
-	make -C restyologpu clean
-	make -C yologpu clean
+	make -C restyolocuda clean
+	make -C yolocuda clean
 
 deep-clean:
 	-docker rm -f `docker ps -aq` 2>/dev/null || :
