@@ -18,7 +18,21 @@ All of the examples here *require a recent version of Docker* to be installer (I
 
 Using docker makes these examples extremely portable, requiring little or no setup on any host to use these examples. Usually all prerequistes are embedded within the resulting Docker containers. I try to do almost all of my coding within Docker containers these days, and acahtina is no exception.
 
-Most of these examples use the following 3 shared service containers:
+## Usage
+
+To quickly try this on your Linux machine:
+
+- attach a camera (usually on `/dev/video0`, and compatible with `fswebcam`)
+- make sure docker, git and make are installed
+- clone this git repo, then cd into the top directory
+- run `make test-yolocpu` (or some other target)
+- when everything is up, point your browser to port `5200` on this machine
+
+For more info, read the `README.md` files (here at the top, and in each of the example directories). Also read the Makefiles in each of these directories to see how the Docker containers are started, and the environment variables you can use to configure them differently (e.g., for a local camera on a different path than `/dev/video0`, or for your own webcam service).
+
+## More Details
+
+Many of the examples use the following 3 shared service containers:
 
 ### Shared Service -- restcam
 
@@ -33,6 +47,8 @@ Although it is not strictly necessary for the inferencing, all of the examples p
 The shared [monitor](https://github.com/MegaMosquito/achatina/tree/master/shared/monitor) service is also not required, but it enables a quick local check of these examples. When you are running these examples you can navigate to the host's port `5200` using your browser to see live output. There you should see output similar to this:
 
 ![example-page](https://raw.githubusercontent.com/MegaMosquito/achatina/master/page.png)
+
+## The Examples
 
 This repository contains the following examples:
 
