@@ -1,12 +1,12 @@
-# achatina
+![achatina](https://raw.githubusercontent.com/MegaMosquito/achatina/master/achatina.png)
 
 Achatina is a set of examples that do visual inferencing using Docker containers on small computers, usually relatively slowly.
-
-![achatina](https://raw.githubusercontent.com/MegaMosquito/achatina/master/achatina.png)
 
 ## Object Detection and Classification
 
 The examples in this repository do visual inferencing. That is, these examples examine visual images and try to infer something interesting from the images. For example, they may try to detect whether there are any people or elephants in the image. In general, when they detect something, they try to classify it, and they annotate the incoming image to highlight what was detected. They also construct a standard JSON description of everything detected, and with the resulting base64-encoded image embedded as well. Here's an example output image:
+
+![example-image](https://raw.githubusercontent.com/MegaMosquito/achatina/master/example.jpg)
 
 Many of these examples are based on the [YOLO/DarkNet](https://pjreddie.com/darknet/yolo/) models trained from the [COCO](http://cocodataset.org/#home) data set. The COCO data set contains examples of 80 classes of visual objects from people to elephants. The YOLO/DarkNet software and models come in a variety of levels, but in general the examples here use the latest "tiny" versions.
 
@@ -30,9 +30,9 @@ Although it is not strictly necessary for the inferencing, all of the examples p
 
 ### Shared Service -- monitor
 
-The shared [monitor](https://github.com/MegaMosquito/achatina/tree/master/shared/monitor) service is also not required, but it enables a quick local check of these examples. When you are running these examples you can navigate to the host's port `5200` using your browser to see live output. There you shoudl see output similar to this:
+The shared [monitor](https://github.com/MegaMosquito/achatina/tree/master/shared/monitor) service is also not required, but it enables a quick local check of these examples. When you are running these examples you can navigate to the host's port `5200` using your browser to see live output. There you should see output similar to this:
 
-![example-image](https://raw.githubusercontent.com/MegaMosquito/achatina/master/example.jpg)
+![example-page](https://raw.githubusercontent.com/MegaMosquito/achatina/master/page.png)
 
 This repository contains the following examples:
 
