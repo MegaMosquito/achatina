@@ -38,15 +38,15 @@ This repository contains the following examples:
 
 ### CPU-Only Example
 
-The [yolocpu](https://github.com/MegaMosquito/achatina/tree/master/yolocpu) example works on arm32, arm64, and amd64 hardware using only the CPU(s) of the machine. CPUs are not very fast for visual inferencing, but if that's all you've got you can still do cool stuff with them. And hey, if it takes 60 seconds to detect something in an image, maybe that is more than fine for your particular application. If so, you can save some of your cash, because the accellerated examples usually have significant additional costs. Achatina may be slow, but she's happy with just a CPU to work with. She doesn't need any fancy inferencing accellerators to get the job done.
+The [yolocpu](https://github.com/MegaMosquito/achatina/tree/master/yolocpu) example works on arm32, arm64, and amd64 hardware using only the CPU(s) of the machine. CPUs are not very fast for visual inferencing, but if that's all you've got you can still do cool stuff with them. And hey, if it takes 60 seconds to detect something in an image, maybe that is more than fine for your particular application. If so, you can save some of your cash, because the accelerated examples usually have significant additional costs. Achatina may be slow, but she's happy with just a CPU to work with. She doesn't need any fancy inferencing accelerators to get the job done.
 
-### Accellerated Examples
+### Accelerated Examples
 
-Of course, using a GPU (or specialized visual inferencing hardware) to accellerate inferencing can usually significantly improve achatina's speed. Accellerated examples available currently include:
+Of course, using a GPU (or specialized visual inferencing hardware) to accelerate inferencing can usually significantly improve achatina's speed. Accelerated examples available currently include:
 
 1. NVIDIA CUDA Example
 
-Currently the CUDA example is the only GPU-accellerated example provided. The [yolocuda](https://github.com/MegaMosquito/achatina/tree/master/yolocuda) example relies on the NVIDIA CUDA software which requires an NVIDIA GPU. Currently the CUDA example only works with these NVIDIA Jetson boards: TX1, TX2, and Nano.
+Currently the CUDA example is the only GPU-accelerated example provided. The [yolocuda](https://github.com/MegaMosquito/achatina/tree/master/yolocuda) example relies on the NVIDIA CUDA software which requires an NVIDIA GPU. Currently the CUDA example only works with these NVIDIA Jetson boards: TX1, TX2, and Nano.
 
 2. Intel Movidius Example
 
