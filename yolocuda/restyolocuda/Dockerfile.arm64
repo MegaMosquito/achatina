@@ -20,7 +20,7 @@ RUN pip install flask requests pillow
 
 # Copy over the logo(s)
 COPY o-h.png /
-COPY ibm.png /
+COPY logo.png /
 
 # Copy over the code
 COPY darknet.py /

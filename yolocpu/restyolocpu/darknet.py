@@ -157,7 +157,7 @@ def detect(net, meta, image, thresh=.5, hier_thresh=.5, nms=.45):
 # this source file is added code, whose purpose is to enable access to the
 # existing "detect()" function (directly above) over a Python Flask REST API.
 #
-# Glen Darling <glendarling@us.ibm.com
+# Glen Darling <mosquito@darlingevil.com>
 #
 
 import os
@@ -178,8 +178,8 @@ FLASK_BIND_ADDRESS = '0.0.0.0'
 FLASK_PORT = 80
 #LOGO_IMAGE = '/o-h.png'
 #LOGO_SIZE = (11,10)
-LOGO_IMAGE = '/ibm.png'
-LOGO_SIZE = (27,12)
+LOGO_IMAGE = '/logo.png'
+LOGO_SIZE = (27,13)
 INCOMING_IMAGE = '/tmp/incoming.jpg'
 OUTGOING_IMAGE = '/tmp/outgoing.jpg'
 COLOR_OUTLINE = '#ffffff'

@@ -6,7 +6,7 @@ Achatina is a set of examples that do visual inferencing using Docker containers
 
 The examples in this repository do visual inferencing. That is, these examples examine visual images and try to infer something interesting from the images. For example, they may try to detect whether there are any people or elephants in the image. In general, when they detect something, they try to classify it, and they annotate the incoming image to highlight what was detected. They also construct a standard JSON description of everything detected, and with the resulting base64-encoded image embedded as well. Here's an example output image:
 
-![example-image](https://raw.githubusercontent.com/MegaMosquito/achatina/master/example.jpg)
+![example-image](https://raw.githubusercontent.com/MegaMosquito/achatina/master/example.png)
 
 Many of these examples are based on the [YOLO/DarkNet](https://pjreddie.com/darknet/yolo/) models trained from the [COCO](http://cocodataset.org/#home) data set. The COCO data set contains examples of 80 classes of visual objects from people to elephants. The YOLO/DarkNet software and models come in a variety of levels, but in general the examples here use the latest "tiny" versions.
 
@@ -14,7 +14,7 @@ The YOLO/DarkNet stuff is very easy to work with, and runs on very small compute
 
 ### Docker is Required
 
-All of the examples here *require a recent version of Docker* to be installer (I think version 18.06 or newer will work, maybe older ones too).
+All of the examples here *require a recent version of Docker* to be installed (I think version 18.06 or newer will work, maybe older ones too).
 
 Using docker makes these examples extremely portable, requiring little or no setup on any host to use these examples. Usually all prerequistes are embedded within the resulting Docker containers. I try to do almost all of my coding within Docker containers these days, and acahtina is no exception.
 
@@ -86,11 +86,11 @@ The diagram below shows the common architecture used for these examples:
 
 ![architecture-diagram](https://raw.githubusercontent.com/MegaMosquito/achatina/master/arch.png)
 
-Arrows in the diagram represent the flow of data. Squares represent software components. Start at the `app`, invoke a REST GET on the `detector` service, passing the image source URL. The `detector` then invokes a REST GET on that image source URL (either the default `restcam` service or some other source), runs its inferencing magic upon it, then it responds to the REST GET from the `app` with the results, encoded in JSON (the image, and metadata about what was detected). Normally the `app` then publishes to `mqtt` (optional) and the remote Kafka broker (if credentials were provided). The `monitor` is watching `mqtt` and provides a local web server on port `5200` when you can see the results.
+Arrows in the diagram represent the flow of data. Squares represent software components. Start at the `app`, invoke a REST GET on the `detector` service, passing the image source URL. The `detector` then invokes a REST GET on that image source URL (either the default `restcam` service or some other source), runs its inferencing magic upon it, then it responds to the REST GET from the `app` with the results, encoded in JSON (the image, and metadata about what was detected). Normally the `app` then publishes to `mqtt` (optional) and the remote Kafka broker (if credentials were provided). The `monitor` is watching `mqtt` and provides a local web server on port `5200` where you can see the results.
 
 ## JSON
 
-The detector is expected to deliver a JSOn payload back to the app. That JSOn is then very slightly enhanced by the app to provide some information primarily for the monitor. The resulting JSON that is published to MQTT and kafka has this form:
+The detector is expected to deliver a JSON payload back to the app. That JSON is then very slightly enhanced by the app to provide some information primarily for the monitor. The resulting JSON that is published to MQTT and kafka has this form:
 
 ```
 {
