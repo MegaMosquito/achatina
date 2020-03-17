@@ -205,7 +205,7 @@ if __name__ == "__main__":
   meta = load_meta(metadata)
 
   # Configure REST server args
-  webapp = Flask('yolov3')
+  webapp = Flask('yolo')
   webapp.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
   # Pull in the logo image
@@ -335,7 +335,7 @@ if __name__ == "__main__":
       detect_data['deviceid'] = os.environ['HZN_DEVICE_ID']
     else:
       detect_data['deviceid'] = '** NO DEVICE ID PROVIDED **'
-    detect_data['tool'] = 'yolov3-tiny'
+    detect_data['tool'] = 'yolo-tiny-cuda'
     detect_data['date'] = int(time.time())
     detect_data['camtime'] = round(cam_end - cam_start, 3)
     detect_data['time'] = round(prediction_end - prediction_start, 3)

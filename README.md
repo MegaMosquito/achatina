@@ -70,7 +70,52 @@ The diagram below shows the common architecture used for these examples:
 
 ![architecture-diagram](https://raw.githubusercontent.com/MegaMosquito/achatina/master/arch.png)
 
-Arrows in the diagram represent the flow of data. Squares represent software components. Start at the `app`, invoke a REST GET on the `detector` service, passing the image source URL. The `detector` then invokes a REST GET on that image source URL (either the default `restcam` service or some other source), runs ints inferencing on it, then it responds to the REST GET from the `app` with the results. Normally the app then publishes to `mqtt` (optional) and the remote Kafka broker (if credentials were provided). The `monitor` is watching `mqtt` and provides a local web server on port `5200` when you can see the results.
+Arrows in the diagram represent the flow of data. Squares represent software components. Start at the `app`, invoke a REST GET on the `detector` service, passing the image source URL. The `detector` then invokes a REST GET on that image source URL (either the default `restcam` service or some other source), runs its inferencing magic upon it, then it responds to the REST GET from the `app` with the results, encoded in JSON (the image, and metadata about what was detected). Normally the `app` then publishes to `mqtt` (optional) and the remote Kafka broker (if credentials were provided). The `monitor` is watching `mqtt` and provides a local web server on port `5200` when you can see the results.
+
+## JSON
+
+The detector is expected to deliver a JSOn payload back to the app. That JSOn is then very slightly enhanced by the app to provide some information primarily for the monitor. The resulting JSON that is published to MQTT and kafka has this form:
+
+```
+{
+  "source": "YOLO Tiny (COCO) -- for NVIDIA CUDA",
+  "source-url": "https://github.com/MegaMosquito/achatina/yolocuda",
+  "kafka-sub": " ... <only on MQTT, a complete kafkacat subscribe command> ... ",
+  "detect": {
+    "tool": "yolo-tiny-cuda",
+    "deviceid": "nano-02",
+    "image": " ... <large base64-encoded image is here> ...",
+    "time": 0.132,
+    "date": 1584407149,
+    "camtime": 1.682,
+    "entities": [
+      {
+        "eclass": "person",
+        "details": [
+          { "confidence": 0.996, "cx": 277, "cy": 296, "w": 139, "h": 394 },
+          { "confidence": 0.952, "cx": 120, "cy": 270, "w": 191, "h": 403 },
+          { "confidence": 0.853, "cx": 405, "cy": 276, "w": 166, "h": 394 },
+          { "confidence": 0.667, "cx": 550, "cy": 283, "w": 160, "h": 366 }
+        ]
+      },
+      {
+        "eclass": "elephant",
+        "details": [
+          ...
+        ]
+      }
+    ]
+  }
+}
+```
+
+Fields like `source`, `source-url`, and `tool` provide information about this particular detector. The device sending the data is identified with `device-id`.
+
+Date shows the UTC date and time that the image was acquired. The `camtime` field states the time in seconds required to acquire the image from the webcam. The `time` field states the time in seconds that the inferencing step took.
+
+There may be zero or more entities of zero or more classes detected (YOLO/COCO only knows 80 classes). The `entities` are grouped into classes. The details array for each detected class contains entries showing the detection confidence (between 0.0 and 1.0) plus the center location (cx, cy) and bounding box size (w x h) for each entity.
+
+If kafka credentials were provided, then the `kafkacat` command to subscribe is provided when publishing to MQTT. This is redundant in the kafka data so it is omitted when sending the JSON to kafka.
 
 ## For more info
 
