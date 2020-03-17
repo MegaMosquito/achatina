@@ -76,9 +76,9 @@ Each of these examples consists of multiple Docker containers providing services
 
 The examples here are structured with 5 services:
 
-1. `restcam` -- a webcam service (can use any other web cam service and not include this `restcam` service at all of you wish)
-2. `mqtt` -- a locally accessible MQTT broker (intended for develpment and debugging, can be removed for production)
-3. `monitor` -- a tiny web server, implemented with Python Flask for monitoring the example's output (intended for develpment and debugging, can be removed for production)
+1. `restcam` -- a webcam service (you can optionally use any other web cam service and not include this `restcam` service at all of you wish)
+2. `mqtt` -- a locally accessible MQTT broker (intended for development and debugging; it can optionally be removed)
+3. `monitor` -- a tiny web server, implemented with Python Flask for monitoring the example's output (intended for development and debugging, it can optionally be removed)
 4. a *detector* service -- an object detection and classification REST service (different for each example, using CPU, or CUDA, or other tools as appropriate for the specific example), and
 5. an application -- a top level container that invokes the above detector service, passing it the URL of the web cam to use (the `restcam` service by default), and receiving back the inferencing results. It then publishes the results to the local `mqtt` broker for debugging (and for the local `monitor` to notice and present on a web page). This MQTT publishing is optional. It also publishes the same data to a remote Kafka broker if the appropriate credentials are configured.
 
@@ -88,9 +88,11 @@ The diagram below shows the common architecture used for these examples:
 
 Arrows in the diagram represent the flow of data. Squares represent software components. Start at the `app`, invoke a REST GET on the `detector` service, passing the image source URL. The `detector` then invokes a REST GET on that image source URL (either the default `restcam` service or some other source), runs its inferencing magic upon it, then it responds to the REST GET from the `app` with the results, encoded in JSON (the image, and metadata about what was detected). Normally the `app` then publishes to `mqtt` (optional) and the remote Kafka broker (if credentials were provided). The `monitor` is watching `mqtt` and provides a local web server on port `5200` where you can see the results.
 
+This architecture enables the visual inferencing engine to remain "hot" awaiting new images. That is, at initial warm-up, the neural network is configured and the model weights are loaded, and they remain loaded ("hot") forever after that. They do not need to be reloaded each time inferencing is performed. This is important because neural network models tend to be large, so loading the edge weights is a time-consuming process. If you load them for each individual inferencing task, performance would be much slower. Although achatina may be slow, she does avoid this particular performance degradation altogether.
+
 ## JSON
 
-The detector is expected to deliver a JSON payload back to the app. That JSON is then very slightly enhanced by the app to provide some information primarily for the monitor. The resulting JSON that is published to MQTT and kafka has this form:
+The detector is expected to deliver a JSON payload back to the app. That JSON is then enhanced by the app to add some information for the monitor to show about the detector used in the example (`source`, `source-url`, and `kafka-sub`). The resulting JSON that is published to MQTT and kafka has this form:
 
 ```
 {
@@ -101,8 +103,8 @@ The detector is expected to deliver a JSON payload back to the app. That JSON is
     "tool": "yolo-tiny-cuda",
     "deviceid": "nano-02",
     "image": " ... <large base64-encoded image is here> ...",
-    "time": 0.132,
     "date": 1584407149,
+    "time": 0.132,
     "camtime": 1.682,
     "entities": [
       {
@@ -127,15 +129,13 @@ The detector is expected to deliver a JSON payload back to the app. That JSON is
 
 Fields like `source`, `source-url`, and `tool` provide information about this particular detector. The device sending the data is identified with `device-id`.
 
-Date shows the UTC date and time that the image was acquired. The `camtime` field states the time in seconds required to acquire the image from the webcam. The `time` field states the time in seconds that the inferencing step took.
+The `image` field contains a [base64](https://linux.die.net/man/1/base64)-encoded post-inferencing image. In the image, all detected entities are highlighted with bounding boxes that have a label across the top stating the entity class, the and the classification confidence.
 
-There may be zero or more entities of zero or more classes detected (YOLO/COCO only knows 80 classes). The `entities` are grouped into classes. The details array for each detected class contains entries showing the detection confidence (between 0.0 and 1.0) plus the center location (cx, cy) and bounding box size (w x h) for each entity.
+The `data` field shows the UTC date and time that the image was acquired and inferencing bega. The `camtime` field states the time in seconds that was required to acquire the image from the webcam. The `time` field states the time in seconds that the inferencing step took.
+
+There may be zero or more entities of zero or more classes detected (YOLO/COCO only knows 80 classes). The detected `entities` are organized by class. The details array for each detected class contains entries showing for each detected entity the classification confidence (between 0.0 and 1.0), the center location (cx, cy) and the bounding box size (w x h) surrounding the entity.
 
 If kafka credentials were provided, then the `kafkacat` command to subscribe is provided when publishing to MQTT. This is redundant in the kafka data so it is omitted when sending the JSON to kafka.
-
-## For more info
-
-Each of the examples has its own README.md with additional details.
 
 ## Open-Horizon
 
@@ -177,8 +177,14 @@ Once these examples are published in your Open-Horizon Exchange, you can registe
 
  * run `make register-pattern` or `make register-policy`.
 
+## For more info
+
+Each of the examples has its own README.md with additional details.
+
 ## Author
 
 Written by Glen Darling, March 2020.
-Inspired by earlier work from my former teammate, [David Martin](https://github.com/dcmartin).
+
+Inspired by earlier related work from my former teammate, [David Martin](https://github.com/dcmartin).
+
 
