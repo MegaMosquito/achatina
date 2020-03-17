@@ -1,4 +1,4 @@
-![achatina](https://raw.githubusercontent.com/MegaMosquito/achatina/master/achatina.png)
+![achatina](https://raw.githubusercontent.com/MegaMosquito/achatina/master/art/achatina.png)
 
 Achatina is a set of examples that do visual inferencing using Docker containers on small computers, usually relatively slowly.
 
@@ -6,7 +6,7 @@ Achatina is a set of examples that do visual inferencing using Docker containers
 
 The examples in this repository do visual inferencing. That is, these examples examine visual images and try to infer something interesting from the images. For example, they may try to detect whether there are any people or elephants in the image. In general, when they detect something, they try to classify it, and they annotate the incoming image to highlight what was detected. They also construct a standard JSON description of everything detected, and with the resulting base64-encoded image embedded as well. Here's an example output image:
 
-![example-image](https://raw.githubusercontent.com/MegaMosquito/achatina/master/example.png)
+![example-image](https://raw.githubusercontent.com/MegaMosquito/achatina/master/art/example.png)
 
 Many of these examples are based on the [YOLO/DarkNet](https://pjreddie.com/darknet/yolo/) models trained from the [COCO](http://cocodataset.org/#home) data set. The COCO data set contains examples of 80 classes of visual objects from people to elephants. The YOLO/DarkNet software and models come in a variety of levels, but in general the examples here use the latest "tiny" versions.
 
@@ -46,7 +46,7 @@ Although it is not strictly necessary for the inferencing, all of the examples p
 
 The shared [monitor](https://github.com/MegaMosquito/achatina/tree/master/shared/monitor) service is also not required, but it enables a quick local check of these examples. When you are running these examples you can navigate to the host's port `5200` using your browser to see live output. There you should see output similar to this:
 
-![example-page](https://raw.githubusercontent.com/MegaMosquito/achatina/master/page.png)
+![example-page](https://raw.githubusercontent.com/MegaMosquito/achatina/master/art/page.png)
 
 ## The Examples
 
@@ -84,7 +84,7 @@ The examples here are structured with 5 services:
 
 The diagram below shows the common architecture used for these examples:
 
-![architecture-diagram](https://raw.githubusercontent.com/MegaMosquito/achatina/master/arch.png)
+![architecture-diagram](https://raw.githubusercontent.com/MegaMosquito/achatina/master/art/arch.png)
 
 Arrows in the diagram represent the flow of data. Squares represent software components. Start at the `app`, invoke a REST GET on the `detector` service, passing the image source URL. The `detector` then invokes a REST GET on that image source URL (either the default `restcam` service or some other source), runs its inferencing magic upon it, then it responds to the REST GET from the `app` with the results, encoded in JSON (the image, and metadata about what was detected). Normally the `app` then publishes to `mqtt` (optional) and the remote Kafka broker (if credentials were provided). The `monitor` is watching `mqtt` and provides a local web server on port `5200` where you can see the results.
 
