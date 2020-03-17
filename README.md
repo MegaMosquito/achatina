@@ -70,7 +70,7 @@ Currently the CUDA example is the only GPU-accelerated example provided. The [yo
 
 ## How Does It Work?
 
-Each of these examples consists of multiple Docker containers providing services to each other privately and exposing some services on the host. Each of them also is designed to push its results to a remote [Apache Kafka](xxx) end point (broker). If you provide Kafka credentials, for a broker you have configured, then you can subscribe to that Kafka broker from other machines and monitor the output remotely.
+Each of these examples consists of multiple Docker containers providing services to each other privately and exposing some services on the host. Each of them also is designed to push its results to a remote [Apache Kafka](https://kafka.apache.org/) end point (broker). If you provide Kafka credentials, for a broker you have configured, then you can subscribe to that Kafka broker from other machines and monitor the output remotely.
 
 ### Service Architecture
 
