@@ -46,9 +46,10 @@ clean:
 	# Add additional makes here for any added examples
 
 ANAX_CONTAINER:=$(word 1, $(shell sh -c "docker ps | grep 'openhorizon/amd64_anax'"))
+EXTRA:=$(if $(ANAX_CONTAINER), | grep -v $(ANAX_CONTAINER), )
 stop:
 	@echo "Stopping and removing Docker containers."
-	-docker rm -f `docker ps -aq | grep -v "${ANAX_CONTAINER}"` 2>/dev/null || :
+	-docker rm -f `docker ps -aq ${EXTRA}` 2>/dev/null || :
 
 ANAX_IMAGE:=$(word 3, $(shell sh -c "docker images | grep 'openhorizon/amd64_anax'"))
 foo:
