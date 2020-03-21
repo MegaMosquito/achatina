@@ -9,10 +9,10 @@ SERVICE_VERSION:="1.0.0"
 
 ARCH:=arm
 _ARCH:=$(shell uname -p)
-ifeq ($(_ARCH),'aarch64')
+ifeq ($(_ARCH),aarch64)
   ARCH:=arm64
 endif
-ifeq ($(_ARCH),'i386')
+ifeq ($(_ARCH),i386)
   ARCH:=amd64
 endif
 
