@@ -2,6 +2,8 @@
 
 Achatina is a set of examples that do visual inferencing using Docker containers on small computers, usually relatively slowly.
 
+One of my goals for achatina is to make everything here *easily understandable*. To that end, almost all of the code files in the examples provided here have fewer than 100 lines. As a former university Computer Science teacher for many years, I have found that keeping examples to this size enables most people to understand them quickly.
+
 ## Object Detection and Classification
 
 The examples in this repository do visual inferencing. That is, these examples examine visual images and try to infer something interesting from the images. For example, they may try to detect whether there are any people or elephants in the image. In general, when they detect something, they try to classify it, and they annotate the incoming image to highlight what was detected. They also construct a standard JSON description of everything detected, and with the resulting base64-encoded image embedded as well. Here's an example output image:
@@ -163,11 +165,11 @@ To build all of these examples and publish them to your Open-Horizon Exchange, f
 
  * create a cryptographic signing key (if your environment does not have keys handy, you can optionally use `hzn key create ...` for this)
 
- * run: `make publish-all-services`
+ * run: `make publish-all-services` to publish all of the services, for all of the examples, for all of the supported architectures
 
- * if you wish to deploy using patterns, run: `make publish-all-patterns`
+ * if you wish to deploy using patterns, run: `make publish-all-patterns` to publish all of the supported deployment patterns for all of the examples
 
- * if you wish to deploy using policies, run: `make publish-all-policies`
+ * if you wish to deploy using policies, run: `make publish-all-policies` to publish all of the provided business/deployment policies for all of the examples
 
 ### Register your Edge Machines
 
@@ -175,7 +177,14 @@ Once these examples are published in your Open-Horizon Exchange, you can registe
 
  * clone this repo, cd into the top directory, and
 
- * run `make register-pattern` or `make register-policy`.
+ * run any of these commands:
+
+```
+     make register-yolocpu-pattern
+     make register-yolocpu-policy
+     make register-yolocuda-pattern
+     make register-yolocuda-policy
+```
 
 ## For more info
 
@@ -183,7 +192,7 @@ Each of the examples has its own README.md with additional details.
 
 ## Author
 
-Written by Glen Darling, March 2020.
+Written by Glen Darling <mosquito@darlingevil.com>, March 2020.
 
 Inspired by earlier related work from my former teammate, [David Martin](https://github.com/dcmartin).
 

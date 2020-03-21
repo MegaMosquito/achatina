@@ -1,48 +1,89 @@
-# A simple Makefile for the achatina examples
-
-help:
-	@echo "Please see the \"README.md\" file for instructions."
+#
+# A simple top level Makefile for the achatina examples
+#
+# Targets for dev and test:
+#   test                  (build and test an example locally)
+#   register-pattern      (register the host for an example using a pattern)
+#   register-policy       (register the host for an example using a policy)
+#   clean                 (stop and remove all of the example containers)
+#   stop                  (stop and remove all containers, except anax)
+#   deep-clean            (clean, stop, and also remove all container images except anax, and the docker network used for testing)
+#
+# Targets for publishing to any Horizon Exchange
+#   publish-all-services  (build, push, and publish all of the services in all of the examples, for all supported architectures)
+#   publish-all-patterns  (publish all of the deployment patterns supported by all of the examples)
+#   publish-all-policies  (publish all of the business/deployment policies provided by all of the examples)
+#
 
 test: test-yolocpu
+register-pattern: register-yolocpu-pattern
+register-policy: register-yolocpu-policy
 
-test-shared-services:
-	@echo "Building all of the shared services..."
-	make -C shared test
-
-publish-services:
+publish-all-services:
 	@echo "Building and publishing the shared services..."
-	make -C shared publish-services
-	@echo "Building and publishing all the services..."
-	make -C yolocpu publish-services
-	make -C yolocuda publish-services
+	$(MAKE) -C shared publish-all-services
+	@echo "Building and publishing all the example services..."
+	$(MAKE) -C yolocpu publish-all-services
+	$(MAKE) -C yolocuda publish-all-services
+	# Add additional makes here for any added examples
+
+publish-all-patterns:
+	@echo "Publishing the patterns for all of the examples..."
+	$(MAKE) -C yolocpu publish-all-patterns
+	$(MAKE) -C yolocuda publish-all-patterns
+	# Add additional makes here for any added examples
+
+publish-all-policies:
+	@echo "Publishing the business/deployment policies for all of the examples..."
+	$(MAKE) -C yolocpu publish-all-policies
+	$(MAKE) -C yolocuda publish-all-policies
+	# Add additional makes here for any added examples
 
 clean:
-	make -C shared clean
-	make -C yolocpu clean
-	make -C yolocuda clean
+	$(MAKE) -C shared clean
+	$(MAKE) -C yolocpu clean
+	$(MAKE) -C yolocuda clean
+	# Add additional makes here for any added examples
 
-deep-clean:
-	-docker rm -f `docker ps -aq` 2>/dev/null || :
+ANAX_CONTAINER:=$(word 1, $(shell sh -c "docker ps | grep 'openhorizon/amd64_anax'"))
+stop:
+	@echo "Stopping and removing Docker containers."
+	-docker rm -f `docker ps -aq | grep -v "${ANAX_CONTAINER}"` 2>/dev/null || :
+
+ANAX_IMAGE:=$(word 3, $(shell sh -c "docker images | grep 'openhorizon/amd64_anax'"))
+foo:
+deep-clean: clean stop
+	@echo "Removing Docker container images."
+	-docker rmi -f `docker images -aq | grep -v "${ANAX_IMAGE}"` 2>/dev/null || :
+	@echo "Removing the Docker network used for testing."
 	-docker network rm mqtt-net 2>/dev/null || :
-	-docker rmi -f `docker images -aq` 2>/dev/null || :
 
-.PHONY: help test test-shared-services publish-services clean deep-clean
+.PHONY: test register-patter register-policy clean stop deep-clean publish-all-services publish-all-patterns publish-all-policies
+
+#
+# Provide convenience targets for any added examples here, if desired:
+#
 
 # YOLO for CPU
-test-yolocpu: test-shared-services
+test-yolocpu:
 	@echo "Performing  local test (outside of Horizon) for YOLOv3 (CPU)..."
-	make -C yolocpu test
-register-yolocpu:
-	make -C yolocpu register
-.PHONY: test-yolocpu register-yolocpu
+	$(MAKE) -C yolocpu test
+register-yolocpu-pattern:
+	$(MAKE) -C yolocpu register-pattern
+register-yolocpu-policy:
+	$(MAKE) -C yolocpu register-policy
+.PHONY: test-yolocpu register-yolocpu-pattern register-yolocpu-policy
+
 
 # YOLO for CUDA
-test-yolocuda: test-shared-services
+test-yolocuda:
 	@echo "Performing  local test (outside of Horizon) for YOLO (CUDA)..."
-	make -C yolocuda test
-register-yolocuda:
-	make -C yolocuda register
-.PHONY: test-yolocuda register-yolocuda
+	$(MAKE) -C yolocuda test
+register-yolocuda-pattern:
+	$(MAKE) -C yolocuda register-pattern
+register-yolocuda-policy:
+	$(MAKE) -C yolocuda register-policy
+.PHONY: test-yolocuda register-yolocuda-pattern register-yolocuda-policy
 
 
 

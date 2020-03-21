@@ -1,71 +1,87 @@
 # A simple Makefile for the achatina YOLO CPU example
 
-help:
-	@echo "Please see the \"README.md\" file for instructions."
+test: validate-dockerhubid check-cam-url
+	@echo "Performing local test of the YOLO (for CPU) example..."
+	$(MAKE) -C ../shared test
+	$(MAKE) -C restyolocpu
+	$(MAKE) -C restyolocpu test
+	$(MAKE) -C yolocpu
+	$(MAKE) -C yolocpu test
 
-test:
-	@echo "Performing  local test (outside of Horizon)..."
+clean:
+	$(MAKE) -C restyolocpu clean
+	$(MAKE) -C yolocpu clean
+
+ANAX_CONTAINER:=$(word 1, $(shell sh -c "docker ps | grep 'openhorizon/amd64_anax'"))
+stop:
+	@echo "Stopping and removing Docker containers."
+	-docker rm -f `docker ps -aq | grep -v "${ANAX_CONTAINER}"` 2>/dev/null || :
+
+ANAX_IMAGE:=$(word 3, $(shell sh -c "docker images | grep 'openhorizon/amd64_anax'"))
+foo:
+deep-clean: clean stop
+	@echo "Removing Docker container images."
+	-docker rmi -f `docker images -aq | grep -v "${ANAX_IMAGE}"` 2>/dev/null || :
+	@echo "Removing the Docker network used for testing."
+	-docker network rm mqtt-net 2>/dev/null || :
+
+#
+# Targets for publishing this service to an Open-Horizon Exhange and for registering edge devices with Open-Horizon
+#
+# NOTE: You must install the Open-Horizon CLI in order to use these targets!
+#
+
+publish-all-services: validate-dockerhubid validate-org
+	@echo "Building and publishing the local services for all architectures..."
+	ARCH=arm $(MAKE) -C restyolocpu
+	ARCH=arm64 $(MAKE) -C restyolocpu
+	ARCH=amd64 $(MAKE) -C restyolocpu
+	$(MAKE) -C restyolocpu publish-all-services
+	ARCH=arm $(MAKE) -C yolocpu
+	ARCH=arm64 $(MAKE) -C yolocpu
+	ARCH=amd64 $(MAKE) -C yolocpu
+	$(MAKE) -C yolocpu publish-all-services
+	@echo "  NOTE: the shared services must also be published (restcam, mqtt, monitor)."
+	@echo "  NOTE: after this, also please publish a pattern or policies."
+
+publish-all-patterns: validate-org
+	@echo "Publishing all supported deployment patterns for this example..."
+	hzn exchange pattern publish -f deployment/pattern-yolocpu.json
+
+publish-all-policies: validate-org
+	@echo "Publishing business/deployment policies for this example..."
+	hzn exchange business addpolicy -f ./deployment/example-business-policy.json
+
+register-pattern: check-cam-url
+	hzn register --pattern "${HZN_ORG_ID}/pattern-yolocpu --input-file ./deployment/example-input-file.json
+
+register-policy:
+	hzn register --policy ./deployment/example-node-policy.json
+
+#
+# Sanity check targets
+#
+
+validate-dockerhubid:
 	@if [ -z "${DOCKERHUB_ID}" ]; \
           then { echo "***** ERROR: \"DOCKERHUB_ID\" is not set!"; exit 1; }; \
           else echo "  NOTE: Using DockerHubID: \"${DOCKERHUB_ID}\""; \
         fi
-	@if [ -z "${CAM_URL}" ]; \
-	  then echo "  Warning: \"CAM_URL\" is not set! Using default."; \
-	  else echo "  NOTE: Using camera URL: ${CAM_URL}"; \
-	fi
-	@if [ -z "${EVENTSTREAMS_BROKER_URLS}" ] || \
-	  [ -z "${EVENTSTREAMS_API_KEY}" ] || \
-	  [ -z "${EVENTSTREAMS_PUB_TOPIC}" ]; \
-	  then echo "  Warning: No EventStreams credentials found! Kafka publication is disabled."; \
-	  else echo "  NOTE: Publishing to topic: ${EVENTSTREAMS_PUB_TOPIC}"; \
-	fi
-	@echo "  NOTE: Building and starting the shared services..."
-	make -C ../shared test
-	@echo "  NOTE: Building and starting the local services..."
-	make -C restyolocpu
-	make -C restyolocpu test
-	make -C yolocpu
-	make -C yolocpu test
+	@sleep 1
 
-publish-services:
-	@echo "Building and publishing the local services..."
-	@if [ -z "${DOCKERHUB_ID}" ]; \
-          then { echo "***** ERROR: \"DOCKERHUB_ID\" is not set!"; exit 1; }; \
-          else echo "  NOTE: Using DockerHubID: \"${DOCKERHUB_ID}\""; \
-        fi
+validate-org:
 	@if [ -z "${HZN_ORG_ID}" ]; \
 	  then { echo "***** ERROR: \"HZN_ORG_ID\" is not set!"; exit 1; }; \
 	  else echo "  NOTE: Using Exchange Org ID: \"${HZN_ORG_ID}\""; \
 	fi
-	@sleep 2
-	make -C restyolocpu
-	make -C restyolocpu push
-	make -C restyolocpu publish-service
-	make -C yolocpu
-	make -C yolocpu push
-	make -C yolocpu publish-service
-	@echo "  NOTE: the shared services must also be published (restcam, mqtt, monitor)."
-	@echo "  NOTE: after this, also please publish a pattern or policies."
+	@sleep 1
 
-publish-pattern:
-	@echo "Publishing a pattern for the shared and local services..."
-	@if [ -z "${DOCKERHUB_ID}" ]; \
-          then { echo "***** ERROR: \"DOCKERHUB_ID\" is not set!"; exit 1; }; \
-          else echo "  NOTE: Using DockerHubID: \"${DOCKERHUB_ID}\""; \
-        fi
-	hzn exchange pattern publish -f patterns/pattern-yolo-cpu.json
+check-cam-url:
+	@if [ -z "${CAM_URL}" ]; \
+	  then echo "  Warning: \"CAM_URL\" is not set! Using default."; \
+	  else echo "  NOTE: Using camera URL: ${CAM_URL}"; \
+	fi
+	@sleep 1
 
-register:
-	hzn register --pattern "${HZN_ORG_ID}/pattern-yolo-cpu" --input-file ./input.json
-
-clean:
-	make -C restyolocpu clean
-	make -C yolocpu clean
-
-deep-clean:
-	-docker rm -f `docker ps -aq` 2>/dev/null || :
-	-docker network rm mqtt-net 2>/dev/null || :
-	-docker rmi -f `docker images -aq` 2>/dev/null || :
-
-.PHONY: help test publish-services publish-pattern register clean deep-clean
+.PHONY: test clean deep-clean publish-all-services publish-all-patterns publish-all-policies register-pattern register-policy validate-dockerhubid validate-org check-cam-url
 
