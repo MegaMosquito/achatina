@@ -15,6 +15,9 @@ endif
 ifeq ($(_ARCH),i386)
   ARCH:=amd64
 endif
+ifeq ($(_ARCH),x86_64)
+  ARCH:=amd64
+endif
 
 build: validate-dockerhubid
 	docker build -t $(DOCKERHUB_ID)/$(SERVICE_NAME)_$(ARCH):$(SERVICE_VERSION) -f ./Dockerfile.$(ARCH) .
