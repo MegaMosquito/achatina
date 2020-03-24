@@ -15,6 +15,9 @@ endif
 ifeq ($(_ARCH),i386)
   ARCH:=amd64
 endif
+ifeq ($(_ARCH),x86_64)
+  ARCH:=amd64
+endif
 
 build: validate-dockerhubid
 	docker build -t $(DOCKERHUB_ID)/$(SERVICE_NAME)_$(ARCH):$(SERVICE_VERSION) -f ./Dockerfile.$(ARCH) .
@@ -22,8 +25,12 @@ build: validate-dockerhubid
 # If HZN_DEVICE_ID is not set, use the hostname
 HZN_DEVICE_ID := $(or $(HZN_DEVICE_ID),$(shell sh -c 'host `hostname`'))
 
-# Get a host routed IP address (used only if CAM_URL not set)
+# Get a host routed IPv4 address (used only if CAM_URL not set)
 HOST_IP:=$(word 4, $(shell sh -c 'host `hostname`'))
+ifeq (address, $(HOST_IP))
+  # Above does not work on RPi, so use this more complex method there:
+  HOST_IP:=$(word 2,$(shell sh -c "ifconfig `ip route | awk '/default/{print$$5}'` | grep '[\t ]inet '"))
+endif
 
 dev: validate-dockerhubid check-cam-url
 	-docker rm -f ${SERVICE_NAME} 2>/dev/null || :
