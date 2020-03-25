@@ -32,7 +32,14 @@ deep-clean: clean stop
 # NOTE: You must install the Open-Horizon CLI in order to use these targets!
 #
 
-publish-all-services: validate-dockerhubid validate-org
+publish-all-services:
+	@echo "Building and publishing the local services for this architecture only..."
+	$(MAKE) -C restyolocuda publish-service
+	$(MAKE) -C yolocuda publish-service
+	@echo "  NOTE: the shared services must also be published (restcam, mqtt, monitor)."
+	@echo "  NOTE: after this, also please publish a pattern or policies."
+
+publish-all-services:
 	@echo "Building and publishing the local services for all architectures..."
 	$(MAKE) -C restyolocuda publish-all-services
 	$(MAKE) -C yolocuda publish-all-services
@@ -57,13 +64,6 @@ register-policy:
 # Sanity check targets
 #
 
-validate-dockerhubid:
-	@if [ -z "${DOCKERHUB_ID}" ]; \
-          then { echo "***** ERROR: \"DOCKERHUB_ID\" is not set!"; exit 1; }; \
-          else echo "  NOTE: Using DockerHubID: \"${DOCKERHUB_ID}\""; \
-        fi
-	@sleep 1
-
 validate-org:
 	@if [ -z "${HZN_ORG_ID}" ]; \
 	  then { echo "***** ERROR: \"HZN_ORG_ID\" is not set!"; exit 1; }; \
@@ -78,5 +78,5 @@ check-cam-url:
 	fi
 	@sleep 1
 
-.PHONY: test clean deep-clean publish-all-services publish-all-patterns publish-all-policies register-pattern register-policy validate-dockerhubid validate-org check-cam-url
+.PHONY: test clean deep-clean publish-all-services publish-all-patterns publish-all-policies register-pattern register-policy validate-org check-cam-url
 

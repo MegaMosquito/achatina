@@ -44,7 +44,7 @@ clean: validate-dockerhubid
 # NOTE: You must install the Open-Horizon CLI in order to use these targets!
 #
 
-publish-service: validate-dockerhubid
+publish-service: validate-dockerhubid validate-org
 	docker build -t $(DOCKERHUB_ID)/$(SERVICE_NAME)_$(ARCH):$(SERVICE_VERSION) -f ./Dockerfile.$(ARCH) .
 	ARCH=$(ARCH) \
           SERVICE_NAME="$(SERVICE_NAME)" \
@@ -52,7 +52,7 @@ publish-service: validate-dockerhubid
           DOCKER_IMAGE_BASE="$(DOCKERHUB_ID)/$(SERVICE_NAME)"\
           hzn exchange service publish -f service.json --pull-image
 
-publish-all-services: validate-dockerhubid
+publish-all-services: validate-dockerhubid validate-org
 	docker build -t $(DOCKERHUB_ID)/$(SERVICE_NAME)_arm:$(SERVICE_VERSION) -f ./Dockerfile.arm .
 	ARCH=arm \
           SERVICE_NAME="$(SERVICE_NAME)" \
@@ -83,5 +83,13 @@ validate-dockerhubid:
         fi
 	@sleep 1
 
-.PHONY: build test test-sub test-pub test-end clean publish-service publish-all-services validate-dockerhubid
+validate-org:
+	@if [ -z "${HZN_ORG_ID}" ]; \
+          then { echo "***** ERROR: \"HZN_ORG_ID\" is not set!"; exit 1; }; \
+          else echo "  NOTE: Using Exchange Org ID: \"${HZN_ORG_ID}\""; \
+        fi
+	@sleep 1
+
+
+.PHONY: build test test-sub test-pub test-end clean publish-service publish-all-services validate-dockerhubid validate-org
 

@@ -10,6 +10,7 @@
 #   deep-clean            (clean, stop, and also remove all container images except anax, and the docker network used for testing)
 #
 # Targets for publishing to any Horizon Exchange
+#   publish-local-services  (build, push, and publish all of the services in all of the examples, for just the local architecture)
 #   publish-all-services  (build, push, and publish all of the services in all of the examples, for all supported architectures)
 #   publish-all-patterns  (publish all of the deployment patterns supported by all of the examples)
 #   publish-all-policies  (publish all of the business/deployment policies provided by all of the examples)
@@ -18,6 +19,14 @@
 test: test-yolocpu
 register-pattern: register-yolocpu-pattern
 register-policy: register-yolocpu-policy
+
+publish-local-services:
+	@echo "Building and publishing the shared services..."
+	$(MAKE) -C shared publish-local-services
+	@echo "Building and publishing all the example services..."
+	$(MAKE) -C yolocpu publish-local-services
+	$(MAKE) -C yolocuda publish-local-services
+	# Add additional makes here for any added examples
 
 publish-all-services:
 	@echo "Building and publishing the shared services..."
