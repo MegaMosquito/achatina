@@ -32,7 +32,7 @@ deep-clean: clean stop
 # NOTE: You must install the Open-Horizon CLI in order to use these targets!
 #
 
-publish-all-services:
+publish-local-services:
 	@echo "Building and publishing the local services for this architecture only..."
 	$(MAKE) -C restyolocuda publish-service
 	$(MAKE) -C yolocuda publish-service
