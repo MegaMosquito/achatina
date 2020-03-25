@@ -73,18 +73,18 @@ publish-all-services: validate-dockerhubid validate-org
 #
 
 validate-dockerhubid:
-        @if [ -z "${DOCKERHUB_ID}" ]; \
+	@if [ -z "${DOCKERHUB_ID}" ]; \
           then { echo "***** ERROR: \"DOCKERHUB_ID\" is not set!"; exit 1; }; \
           else echo "  NOTE: Using DockerHubID: \"${DOCKERHUB_ID}\""; \
         fi
-        @sleep 1
+	@sleep 1
 
 validate-org:
-        @if [ -z "${HZN_ORG_ID}" ]; \
+	@if [ -z "${HZN_ORG_ID}" ]; \
           then { echo "***** ERROR: \"HZN_ORG_ID\" is not set!"; exit 1; }; \
           else echo "  NOTE: Using Exchange Org ID: \"${HZN_ORG_ID}\""; \
         fi
-        @sleep 1
+	@sleep 1
 
 
 .PHONY: build dev test clean publish-service publish-all-services validate-dockerhubid validate-org
