@@ -34,13 +34,7 @@ deep-clean: clean stop
 
 publish-all-services: validate-dockerhubid validate-org
 	@echo "Building and publishing the local services for all architectures..."
-	ARCH=arm $(MAKE) -C restyolocpu
-	ARCH=arm64 $(MAKE) -C restyolocpu
-	ARCH=amd64 $(MAKE) -C restyolocpu
 	$(MAKE) -C restyolocpu publish-all-services
-	ARCH=arm $(MAKE) -C yolocpu
-	ARCH=arm64 $(MAKE) -C yolocpu
-	ARCH=amd64 $(MAKE) -C yolocpu
 	$(MAKE) -C yolocpu publish-all-services
 	@echo "  NOTE: the shared services must also be published (restcam, mqtt, monitor)."
 	@echo "  NOTE: after this, also please publish a pattern or policies."
@@ -51,10 +45,10 @@ publish-all-patterns: validate-org
 
 publish-all-policies: validate-org
 	@echo "Publishing business/deployment policies for this example..."
-	hzn exchange business addpolicy -f ./deployment/example-business-policy.json
+	hzn exchange business addpolicy -f ./deployment/business-policy.json
 
 register-pattern: check-cam-url
-	hzn register --pattern "${HZN_ORG_ID}/pattern-yolocpu --input-file ./deployment/example-input-file.json
+	hzn register --pattern "${HZN_ORG_ID}/pattern-yolocpu --input-file ./deployment/input-file.json
 
 register-policy:
 	hzn register --policy ./deployment/example-node-policy.json

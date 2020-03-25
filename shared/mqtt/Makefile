@@ -3,21 +3,12 @@
 SERVICE_NAME:="mqtt"
 SERVICE_VERSION:="1.0.0"
 
+# Get the Open-Horizon architecture type, and IP address for this host
+ARCH:=$(shell ../../helper -a)
+
 #
 # Targets for building, testing and cleaning this service
 #
-
-ARCH:=arm
-_ARCH:=$(shell uname -p)
-ifeq ($(_ARCH),aarch64)
-  ARCH:=arm64
-endif
-ifeq ($(_ARCH),i386)
-  ARCH:=amd64
-endif
-ifeq ($(_ARCH),x86_64)
-  ARCH:=amd64
-endif
 
 build: validate-dockerhubid
 	docker build -t $(DOCKERHUB_ID)/$(SERVICE_NAME)_$(ARCH):$(SERVICE_VERSION) -f ./Dockerfile.$(ARCH) .
@@ -54,16 +45,32 @@ clean: validate-dockerhubid
 #
 
 publish-service: validate-dockerhubid
-	ARCH=$(shell hzn architecture) docker build -t $(DOCKERHUB_ID)/$(SERVICE_NAME)_$(ARCH):$(SERVICE_VERSION) -f ./Dockerfile.$(ARCH) .
-	ARCH=$(shell hzn architecture) DOCKER_IMAGE_BASE="$(DOCKERHUB_ID)/$(SERVICE_NAME)" hzn exchange service publish -f service.json --pull-image
+	docker build -t $(DOCKERHUB_ID)/$(SERVICE_NAME)_$(ARCH):$(SERVICE_VERSION) -f ./Dockerfile.$(ARCH) .
+	ARCH=$(ARCH) \
+          SERVICE_NAME="$(SERVICE_NAME)" \
+          SERVICE_VERSION="$(SERVICE_VERSION)"\
+          DOCKER_IMAGE_BASE="$(DOCKERHUB_ID)/$(SERVICE_NAME)"\
+          hzn exchange service publish -f service.json --pull-image
 
 publish-all-services: validate-dockerhubid
-	ARCH=arm SERVICE_NAME="$(SERVICE_NAME)" SERVICE_VERSION="$(SERVICE_VERSION)"  docker build -t $(DOCKERHUB_ID)/$(SERVICE_NAME)_$(ARCH):$(SERVICE_VERSION) -f ./Dockerfile.$(ARCH) .
-	ARCH=arm SERVICE_NAME="$(SERVICE_NAME)" SERVICE_VERSION="$(SERVICE_VERSION)"  DOCKER_IMAGE_BASE="$(DOCKERHUB_ID)/$(SERVICE_NAME)" hzn exchange service publish -f service.json
-	ARCH=arm64 SERVICE_NAME="$(SERVICE_NAME)" SERVICE_VERSION="$(SERVICE_VERSION)"  docker build -t $(DOCKERHUB_ID)/$(SERVICE_NAME)_$(ARCH):$(SERVICE_VERSION) -f ./Dockerfile.$(ARCH) .
-	ARCH=arm64 SERVICE_NAME="$(SERVICE_NAME)" SERVICE_VERSION="$(SERVICE_VERSION)"  DOCKER_IMAGE_BASE="$(DOCKERHUB_ID)/$(SERVICE_NAME)" hzn exchange service publish -f service.json
-	ARCH=amd64 SERVICE_NAME="$(SERVICE_NAME)" SERVICE_VERSION="$(SERVICE_VERSION)"  docker build -t $(DOCKERHUB_ID)/$(SERVICE_NAME)_$(ARCH):$(SERVICE_VERSION) -f ./Dockerfile.$(ARCH) .
-	ARCH=amd64 SERVICE_NAME="$(SERVICE_NAME)" SERVICE_VERSION="$(SERVICE_VERSION)"  DOCKER_IMAGE_BASE="$(DOCKERHUB_ID)/$(SERVICE_NAME)" hzn exchange service publish -f service.json
+	docker build -t $(DOCKERHUB_ID)/$(SERVICE_NAME)_arm:$(SERVICE_VERSION) -f ./Dockerfile.arm .
+	ARCH=arm \
+          SERVICE_NAME="$(SERVICE_NAME)" \
+          SERVICE_VERSION="$(SERVICE_VERSION)"\
+          DOCKER_IMAGE_BASE="$(DOCKERHUB_ID)/$(SERVICE_NAME)"\
+          hzn exchange service publish -f service.json --pull-image
+	docker build -t $(DOCKERHUB_ID)/$(SERVICE_NAME)_arm64:$(SERVICE_VERSION) -f ./Dockerfile.arm64 .
+	ARCH=arm64 \
+          SERVICE_NAME="$(SERVICE_NAME)" \
+          SERVICE_VERSION="$(SERVICE_VERSION)"\
+          DOCKER_IMAGE_BASE="$(DOCKERHUB_ID)/$(SERVICE_NAME)"\
+          hzn exchange service publish -f service.json --pull-image
+	docker build -t $(DOCKERHUB_ID)/$(SERVICE_NAME)_amd64:$(SERVICE_VERSION) -f ./Dockerfile.amd64 .
+	ARCH=amd64 \
+          SERVICE_NAME="$(SERVICE_NAME)" \
+          SERVICE_VERSION="$(SERVICE_VERSION)"\
+          DOCKER_IMAGE_BASE="$(DOCKERHUB_ID)/$(SERVICE_NAME)"\
+          hzn exchange service publish -f service.json --pull-image
 
 #
 # Sanity check targets

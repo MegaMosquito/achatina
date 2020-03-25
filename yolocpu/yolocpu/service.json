@@ -7,8 +7,8 @@
   "public": true,
   "sharable": "singleton",
   "requiredServices": [
-    { "org": "$HZN_ORG_ID", "url": "yolov3", "version": "1.0.1", "arch": "$ARCH" },
-    { "org": "$HZN_ORG_ID", "url": "mqtt", "version": "1.0.1", "arch": "$ARCH" }
+    { "org": "$HZN_ORG_ID", "url": "restyolocpu", "version": "1.0.0", "arch": "$ARCH" },
+    { "org": "$HZN_ORG_ID", "url": "mqtt", "version": "1.0.0", "arch": "$ARCH" }
   ],
   "userInput": [
     {
