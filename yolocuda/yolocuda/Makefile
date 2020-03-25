@@ -62,13 +62,8 @@ publish-service: validate-dockerhubid
           DOCKER_IMAGE_BASE="$(DOCKERHUB_ID)/$(SERVICE_NAME)"\
           hzn exchange service publish -f service.json --pull-image
 
+# This service only builds for arm64 and amd64
 publish-all-services: validate-dockerhubid
-	docker build -t $(DOCKERHUB_ID)/$(SERVICE_NAME)_arm:$(SERVICE_VERSION) -f ./Dockerfile.arm .
-	ARCH=arm \
-          SERVICE_NAME="$(SERVICE_NAME)" \
-          SERVICE_VERSION="$(SERVICE_VERSION)"\
-          DOCKER_IMAGE_BASE="$(DOCKERHUB_ID)/$(SERVICE_NAME)"\
-          hzn exchange service publish -f service.json --pull-image
 	docker build -t $(DOCKERHUB_ID)/$(SERVICE_NAME)_arm64:$(SERVICE_VERSION) -f ./Dockerfile.arm64 .
 	ARCH=arm64 \
           SERVICE_NAME="$(SERVICE_NAME)" \
