@@ -56,13 +56,17 @@ show_ip () {
   if [ ${DEBUG} -gt 0 ]; then echo "IP Address."; fi
   if [[ "$OSTYPE" == "linux-"* ]]; then
     # Linux
-    HOST_IP=$(ip route | grep default | head -1 | sed 's/ proto dhcp / /' | cut -d' ' -f7)
+    CIDR=$(ip route | grep default | head -1 | sed 's/ proto dhcp / /' | cut -d' ' -f3 | cut -d'.' -f1-3)'.0/24'
+    if [ ${DEBUG} -gt 0 ]; then echo "CIDR=${CIDR}"; fi
+    HOST_IP=$(ip route | grep "${CIDR}" | head -1 | sed 's/ proto [a-z]*//' | cut -d' ' -f7)
   elif [[ "$OSTYPE" == "darwin"* ]]; then
     # MacOSX
     HOST_IP=$(host `hostname` | head -1 | sed 's/.* //')
   else
     # Other. Best guess:
-    HOST_IP=$(ip route | grep default | head -1 | sed 's/ proto dhcp / /' | cut -d' ' -f7)
+    CIDR=$(ip route | grep default | head -1 | sed 's/ proto dhcp / /' | cut -d' ' -f3 | cut -d'.' -f1-3)'.0/24'
+    if [ ${DEBUG} -gt 0 ]; then echo "CIDR=${CIDR}"; fi
+    HOST_IP=$(ip route | grep "${CIDR}" | head -1 | sed 's/ proto [a-z]*//' | cut -d' ' -f7)
   fi
   echo "${HOST_IP}"
 }
