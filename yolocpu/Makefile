@@ -1,6 +1,6 @@
 # A simple Makefile for the achatina YOLO CPU example
 
-test: validate-dockerhubid check-cam-url
+test: check-cam-url
 	@echo "Performing local test of the YOLO (for CPU) example..."
 	$(MAKE) -C ../shared test
 	$(MAKE) -C restyolocpu
