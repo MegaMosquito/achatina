@@ -14,7 +14,7 @@ HOST_IP:=$(shell ../../helper -i)
 build: validate-dockerhubid
 	docker build -t $(DOCKERHUB_ID)/$(SERVICE_NAME)_$(ARCH):$(SERVICE_VERSION) -f ./Dockerfile.$(ARCH) .
 
-dev: validate-dockerhubid
+dev: build validate-dockerhubid
 	-docker rm -f $(SERVICE_NAME) 2>/dev/null || :
 	docker run -it -v `pwd`:/outside \
            -p 0.0.0.0:5200:5200 \

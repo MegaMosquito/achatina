@@ -17,7 +17,7 @@ HZN_DEVICE_ID := $(or $(HZN_DEVICE_ID),$(shell sh -c 'hostname'))
 build: validate-dockerhubid
 	docker build -t $(DOCKERHUB_ID)/$(SERVICE_NAME)_$(ARCH):$(SERVICE_VERSION) -f ./Dockerfile.$(ARCH) .
 
-dev: validate-dockerhubid check-cam-url
+dev: build validate-dockerhubid check-cam-url
 	-docker rm -f ${SERVICE_NAME} 2>/dev/null || :
 	docker run -it -v `pwd`:/outside \
 	   -e HZN_DEVICE_ID="${HZN_DEVICE_ID}" \

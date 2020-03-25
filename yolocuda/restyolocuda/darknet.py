@@ -55,7 +55,7 @@ class METADATA(Structure):
                 ("names", POINTER(c_char_p))]
 
 #lib = CDLL("/home/pjreddie/documents/darknet/libdarknet.so", RTLD_GLOBAL)
-lib = CDLL("./libdarknet.so", RTLD_GLOBAL)
+lib = CDLL("/darknet/libdarknet.so", RTLD_GLOBAL)
 lib.network_width.argtypes = [c_void_p]
 lib.network_width.restype = c_int
 lib.network_height.argtypes = [c_void_p]
@@ -331,11 +331,7 @@ if __name__ == "__main__":
     for cls in entity_raw:
       entity_data.append(entity_raw[cls])
     detect_data = {}
-    if 'HZN_DEVICE_ID' in os.environ and '' != os.environ['HZN_DEVICE_ID']:
-      detect_data['deviceid'] = os.environ['HZN_DEVICE_ID']
-    else:
-      detect_data['deviceid'] = '** NO DEVICE ID PROVIDED **'
-    detect_data['tool'] = 'yolo-tiny-cuda'
+    detect_data['tool'] = 'yolo-cuda'
     detect_data['date'] = int(time.time())
     detect_data['camtime'] = round(cam_end - cam_start, 3)
     detect_data['time'] = round(prediction_end - prediction_start, 3)

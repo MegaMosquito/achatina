@@ -1,11 +1,11 @@
 #
-# The pump that calls the yolo REST API, then pushes the results to kafka.
-# It can also (optionally) push the data to the local MQTT for debug purposes).
+# The pump that calls the CPU yolo REST API, then pushes the results to kafka.
+# It can also (optionally) push the data to the local MQTT for debug purposes.
 #
 # Written by Glen Darling, March 2020.
 #
 
-EXAMPLE_TITLE = 'YOLO Tiny (COCO) -- for CPU'
+EXAMPLE_TITLE = 'YOLO (COCO) -- for CPU'
 EXAMPLE_URL = 'https://github.com/MegaMosquito/achatina/yolocpu'
 
 import json
@@ -29,6 +29,9 @@ EVENTSTREAMS_API_KEY = get_from_env('EVENTSTREAMS_API_KEY', '')
 EVENTSTREAMS_PUB_TOPIC = get_from_env('EVENTSTREAMS_PUB_TOPIC', '')
 CAM_URL = get_from_env('CAM_URL', '')
 MQTT_PUB_TOPIC = get_from_env('MQTT_PUB_TOPIC', '/detect')
+DEFAULT_HZN_DEVICE_ID = '** NO DEVICE ID ** PUBLISHING TO KAFKA IS DISABLED **'
+HZN_DEVICE_ID = get_from_env('HZN_DEVICE_ID', DEFAULT_HZN_DEVICE_ID)
+
 
 # Try to compute some kind of value for the CAM URL if one was not provided
 if '' == CAM_URL:
@@ -78,18 +81,19 @@ if __name__ == '__main__':
       j = r.json()
       if LOG_ALL or LOG_STATS:
         d = datetime.fromtimestamp(j['detect']['date']).strftime('%Y-%m-%d %H:%M:%S')
-        print('Date: %s, Cam: %0.2f sec, YoloV3: %0.2f msec.' % (d, j['detect']['camtime'], j['detect']['time'] * 1000.0))
+        print('Date: %s, Cam: %0.2f sec, Yolo: %0.2f msec.' % (d, j['detect']['camtime'], j['detect']['time'] * 1000.0))
 
       # Add info into the JSON about this example
       j['source'] = EXAMPLE_TITLE
       j['source-url'] = EXAMPLE_URL
+      j['deviceid'] = HZN_DEVICE_ID
 
       # Push JSON to a file (so we can publish it, since it overflows the CLI)
       with open(TEMP_FILE, 'w') as temp_file:
         json.dump(j, temp_file)
 
-      # Publish to kafka
-      if '' != KAFKA_PUB_COMMAND:
+      # Publish to kafka if a device ID and appropriate creds were provided
+      if HZN_DEVICE_ID != DEFAULT_HZN_DEVICE_ID and '' != KAFKA_PUB_COMMAND:
         if LOG_ALL: print('--> Kafka: ' + KAFKA_PUB_COMMAND + TEMP_FILE)
         discard = subprocess.run(KAFKA_PUB_COMMAND + TEMP_FILE, shell=True)
       else:
@@ -108,6 +112,7 @@ if __name__ == '__main__':
         discard = subprocess.run(DEBUG_PUB_COMMAND + TEMP_FILE, shell=True)
 
     except:
+      if LOG_ALL: print('*** Exception in main loop! ***')
       pass
 
     # Pause briefly (to not hog the CPU too much)

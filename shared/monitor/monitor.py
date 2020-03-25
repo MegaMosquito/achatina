@@ -34,14 +34,12 @@ if __name__ == '__main__':
   class DetectThread(threading.Thread):
     def run(self):
       global last_detect
-      # print("\nDetect topic monitor thread started!")
+      # print("\nMQTT \"" + MQTT_DETECT_TOPIC + "\" topic monitor thread started!")
       DETECT_COMMAND = MQTT_SUB_COMMAND + '-t ' + MQTT_DETECT_TOPIC
       while True:
         last_detect = subprocess.check_output(DETECT_COMMAND, shell=True)
         # print("\n\nMessage received on detect topic...\n")
         # print(last_detect)
-        # print("\nSleeping for " + str(1) + " seconds...\n")
-        #time.sleep(1)
 
   @webapp.route("/images/detect.jpg")
   def get_detect_image():
@@ -66,7 +64,7 @@ if __name__ == '__main__':
   def get_results():
     if None == last_detect: return '{"error":"Server not ready."}'
     j = json.loads(last_detect)
-    n = j['detect']['deviceid']
+    n = j['deviceid']
     c = len(j['detect']['entities'])
     ct = j['detect']['camtime']
     it = j['detect']['time']
