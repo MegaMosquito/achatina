@@ -6,7 +6,7 @@
 #
 
 EXAMPLE_TITLE = 'YOLO (COCO) -- for CPU'
-EXAMPLE_URL = 'https://github.com/MegaMosquito/achatina/yolocpu'
+EXAMPLE_URL = 'https://github.com/MegaMosquito/achatina/tree/master/yolocpu'
 
 import json
 import os

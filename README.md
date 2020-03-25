@@ -27,8 +27,9 @@ To quickly try this on your Linux machine:
 - attach a camera (usually on `/dev/video0`, and compatible with `fswebcam`)
 - make sure docker, git and make are installed
 - clone this git repo, then cd into the top directory
-- run `make test-yolocpu` (or some other target)
-- when everything is up, point your browser to port `5200` on this machine
+- put your dockerhub.com ID into the DOCKERHUB_ID enviropnment variable, e.g.: `export DOCKERHUB_ID=ibmosquito`
+- run `make test` (or some other target) -- the `test` target runs the CPU example
+- when everything finishes building and comes up, point your browser to port `5200` on this machine, i.e., go to: `http://ipaddress:5200/`
 
 For more info, read the `README.md` files (here at the top, and in each of the example directories). Also read the Makefiles in each of these directories to see how the Docker containers are started, and the environment variables you can use to configure them differently (e.g., for a local camera on a different path than `/dev/video0`, or for your own webcam service).
 
@@ -98,8 +99,8 @@ The detector is expected to deliver a JSON payload back to the app. That JSON is
 
 ```
 {
-  "source": "YOLO Tiny (COCO) -- for NVIDIA CUDA",
-  "source-url": "https://github.com/MegaMosquito/achatina/yolocuda",
+  "source": "YOLO (COCO) -- for NVIDIA CUDA",
+  "source-url": "https://github.com/MegaMosquito/achatina/tree/master/yolocuda",
   "kafka-sub": " ... <only on MQTT, a complete kafkacat subscribe command> ... ",
   "detect": {
     "tool": "yolo-tiny-cuda",
