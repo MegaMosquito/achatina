@@ -272,6 +272,7 @@ if __name__ == "__main__":
       r = requests.get(url, auth=(user, password))
     else:
       r = requests.get(url)
+    #print("Camera service returned.")
     if (r.status_code > 299):
       return (json.dumps({"error": "unable to get image from camera"}) + '\n', 400)
     #if (r.headers['content-type'] != 'image/jpg'):
