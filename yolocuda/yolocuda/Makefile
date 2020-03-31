@@ -15,10 +15,14 @@ HZN_DEVICE_ID := $(or $(HZN_DEVICE_ID),$(shell sh -c 'hostname'))
 #
 
 build: validate-dockerhubid
-	docker build -t $(DOCKERHUB_ID)/$(SERVICE_NAME)_$(ARCH):$(SERVICE_VERSION) -f ./Dockerfile.$(ARCH) .
+	@if [ "${ARCH}" != "arm" ]; then \
+          docker build -t $(DOCKERHUB_ID)/$(SERVICE_NAME)_$(ARCH):$(SERVICE_VERSION) -f ./Dockerfile.$(ARCH) .; \
+        fi
 
 push: validate-dockerhubid
-	docker push $(DOCKERHUB_ID)/$(SERVICE_NAME)_$(ARCH):$(SERVICE_VERSION) 
+	@if [ "${ARCH}" != "arm" ]; then \
+	  docker push $(DOCKERHUB_ID)/$(SERVICE_NAME)_$(ARCH):$(SERVICE_VERSION); \
+        fi
 
 dev: validate-dockerhubid check-cam-url
 	-docker rm -f ${SERVICE_NAME} 2>/dev/null || :
@@ -58,11 +62,13 @@ clean: validate-dockerhubid
 #
 
 publish-service: validate-dockerhubid
-	ARCH=$(ARCH) \
+	@if [ "${ARCH}" != "arm" ]; then \
+          ARCH=$(ARCH) \
           SERVICE_NAME="$(SERVICE_NAME)" \
           SERVICE_VERSION="$(SERVICE_VERSION)"\
           DOCKER_IMAGE_BASE="$(DOCKERHUB_ID)/$(SERVICE_NAME)"\
-          hzn exchange service publish -O -f service.json --pull-image
+          hzn exchange service publish -O -f service.json --pull-image; \
+       fi
 
 # This service only builds for arm64 and amd64
 publish-all-services: validate-dockerhubid

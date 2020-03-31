@@ -20,6 +20,14 @@ test: test-yolocpu
 register-pattern: register-yolocpu-pattern
 register-policy: register-yolocpu-policy
 
+all-local:
+	@echo "Building, docker-pushing, and publishing everything for this architecture only..."
+	$(MAKE) build-local-services
+	$(MAKE) push-local-services
+	$(MAKE) publish-local-services
+	@echo "NOTE: after you have done this on each architecture, publish the pattern too."
+	@echo "      E.g.:  make publish-all-patterns"
+
 build-local-services:
 	@echo "Building the shared services..."
 	# Add additional makes here for any added examples

@@ -2,13 +2,17 @@
 
 build-local-services:
 	@echo "Building YOLO (for CUDA) services for this architecture only..."
-	make -C restyolocuda build
-	make -C yolocuda build
+	@if [ "${ARCH}" != "arm" ]; then \
+          $(MAKE) -C restyolocuda build; \
+          $(MAKE) -C yolocuda build; \
+        fi
 
 push-local-services:
 	@echo "Docker-pushing YOLO (for CUDA) services for this architecture only..."
-	make -C restyolocuda push
-	make -C yolocuda push
+	@if [ "${ARCH}" != "arm" ]; then \
+	  $(MAKE) -C restyolocuda push; \
+	  $(MAKE) -C yolocuda push; \
+        fi
 
 test: check-cam-url
 	@echo "Performing local test of the YOLO (for CUDA) example..."
@@ -44,8 +48,10 @@ deep-clean: clean stop
 
 publish-local-services:
 	@echo "Publishing the local services for this architecture only..."
-	$(MAKE) -C restyolocuda publish-service
-	$(MAKE) -C yolocuda publish-service
+	@if [ "${ARCH}" != "arm" ]; then \
+	  $(MAKE) -C restyolocuda publish-service; \
+	  $(MAKE) -C yolocuda publish-service; \
+        fi
 	@echo "  NOTE: the shared services must also be published (restcam, mqtt, monitor)."
 	@echo "  NOTE: after this, also please publish a pattern or policies."
 
