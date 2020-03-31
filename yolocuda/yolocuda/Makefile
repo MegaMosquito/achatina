@@ -60,7 +60,7 @@ publish-service: validate-dockerhubid
           SERVICE_NAME="$(SERVICE_NAME)" \
           SERVICE_VERSION="$(SERVICE_VERSION)"\
           DOCKER_IMAGE_BASE="$(DOCKERHUB_ID)/$(SERVICE_NAME)"\
-          hzn exchange service publish -f service.json --pull-image
+          hzn exchange service publish -O -f service.json --pull-image
 
 # This service only builds for arm64 and amd64
 publish-all-services: validate-dockerhubid
@@ -69,13 +69,13 @@ publish-all-services: validate-dockerhubid
           SERVICE_NAME="$(SERVICE_NAME)" \
           SERVICE_VERSION="$(SERVICE_VERSION)"\
           DOCKER_IMAGE_BASE="$(DOCKERHUB_ID)/$(SERVICE_NAME)"\
-          hzn exchange service publish -f service.json --pull-image
+          hzn exchange service publish -O -f service.json --pull-image
 	docker build -t $(DOCKERHUB_ID)/$(SERVICE_NAME)_amd64:$(SERVICE_VERSION) -f ./Dockerfile.amd64 .
 	ARCH=amd64 \
           SERVICE_NAME="$(SERVICE_NAME)" \
           SERVICE_VERSION="$(SERVICE_VERSION)"\
           DOCKER_IMAGE_BASE="$(DOCKERHUB_ID)/$(SERVICE_NAME)"\
-          hzn exchange service publish -f service.json --pull-image
+          hzn exchange service publish -O -f service.json --pull-image
 
 #
 # Sanity check targets
