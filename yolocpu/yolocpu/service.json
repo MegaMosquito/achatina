@@ -13,6 +13,12 @@
   "userInput": [
     {
       "label": "",
+      "name": "CAM_URL",
+      "type": "string",
+      "defaultValue": ""
+    },
+    {
+      "label": "",
       "name": "EVENTSTREAMS_BROKER_URLS",
       "type": "string",
       "defaultValue": ""
