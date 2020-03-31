@@ -5,26 +5,6 @@
     {
       "serviceUrl": "monitor",
       "serviceOrgid": "$HZN_ORG_ID",
-      "serviceArch": "arm",
-      "serviceVersions": [ { "version": "1.0.0" } ]
-    },
-    {
-      "serviceUrl": "yolocuda",
-      "serviceOrgid": "$HZN_ORG_ID",
-      "serviceArch": "arm",
-      "serviceVersions": [ { "version": "1.0.0" } ]
-    },
-    {
-      "serviceUrl": "restcam",
-      "serviceOrgid": "$HZN_ORG_ID",
-      "serviceArch": "arm",
-      "serviceVersions": [ { "version": "1.0.0" } ]
-    },
-
-
-    {
-      "serviceUrl": "monitor",
-      "serviceOrgid": "$HZN_ORG_ID",
       "serviceArch": "arm64",
       "serviceVersions": [ { "version": "1.0.0" } ]
     },
