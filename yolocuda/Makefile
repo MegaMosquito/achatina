@@ -1,11 +1,21 @@
 # A simple Makefile for the achatina YOLO (CUDA) example
 
+build-local-services:
+	@echo "Building YOLO (for CUDA) services for this architecture only..."
+	make -C restyolocuda build
+	make -C yolocuda build
+
+push-local-services:
+	@echo "Docker-pushing YOLO (for CUDA) services for this architecture only..."
+	make -C restyolocuda push
+	make -C yolocuda push
+
 test: check-cam-url
 	@echo "Performing local test of the YOLO (for CUDA) example..."
 	$(MAKE) -C ../shared test
-	$(MAKE) -C restyolocuda
+	$(MAKE) -C restyolocuda build
 	$(MAKE) -C restyolocuda test
-	$(MAKE) -C yolocuda
+	$(MAKE) -C yolocuda build
 	$(MAKE) -C yolocuda test
 
 clean:
@@ -33,14 +43,14 @@ deep-clean: clean stop
 #
 
 publish-local-services:
-	@echo "Building and publishing the local services for this architecture only..."
+	@echo "Publishing the local services for this architecture only..."
 	$(MAKE) -C restyolocuda publish-service
 	$(MAKE) -C yolocuda publish-service
 	@echo "  NOTE: the shared services must also be published (restcam, mqtt, monitor)."
 	@echo "  NOTE: after this, also please publish a pattern or policies."
 
 publish-all-services:
-	@echo "Building and publishing the local services for all architectures..."
+	@echo "Building, pushing, and publishing the local services for all architectures..."
 	$(MAKE) -C restyolocuda publish-all-services
 	$(MAKE) -C yolocuda publish-all-services
 	@echo "  NOTE: the shared services must also be published (restcam, mqtt, monitor)."

@@ -13,6 +13,9 @@ ARCH:=$(shell ../../helper -a)
 build: validate-dockerhubid
 	docker build -t $(DOCKERHUB_ID)/$(SERVICE_NAME)_$(ARCH):$(SERVICE_VERSION) -f ./Dockerfile.$(ARCH) .
 
+push: validate-dockerhubid
+	docker push $(DOCKERHUB_ID)/$(SERVICE_NAME)_$(ARCH):$(SERVICE_VERSION)
+
 dev: validate-dockerhubid
 	-docker rm -f $(SERVICE_NAME) 2>/dev/null || :
 	docker run -it \
@@ -41,7 +44,6 @@ clean: validate-dockerhubid
 #
 
 publish-service: validate-dockerhubid
-	docker build -t $(DOCKERHUB_ID)/$(SERVICE_NAME)_$(ARCH):$(SERVICE_VERSION) -f ./Dockerfile.$(ARCH) .
 	ARCH=$(ARCH) \
           SERVICE_NAME="$(SERVICE_NAME)" \
           SERVICE_VERSION="$(SERVICE_VERSION)"\
@@ -51,12 +53,14 @@ publish-service: validate-dockerhubid
 # This service only builds for arm64 and amd64
 publish-all-services: validate-dockerhubid
 	docker build -t $(DOCKERHUB_ID)/$(SERVICE_NAME)_arm64:$(SERVICE_VERSION) -f ./Dockerfile.arm64 .
+	docker push $(DOCKERHUB_ID)/$(SERVICE_NAME)_arm64:$(SERVICE_VERSION)
 	ARCH=arm64 \
           SERVICE_NAME="$(SERVICE_NAME)" \
           SERVICE_VERSION="$(SERVICE_VERSION)"\
           DOCKER_IMAGE_BASE="$(DOCKERHUB_ID)/$(SERVICE_NAME)"\
           hzn exchange service publish -O -f service.json --pull-image
 	docker build -t $(DOCKERHUB_ID)/$(SERVICE_NAME)_amd64:$(SERVICE_VERSION) -f ./Dockerfile.amd64 .
+	docker push $(DOCKERHUB_ID)/$(SERVICE_NAME)_amd64:$(SERVICE_VERSION)
 	ARCH=amd64 \
           SERVICE_NAME="$(SERVICE_NAME)" \
           SERVICE_VERSION="$(SERVICE_VERSION)"\
