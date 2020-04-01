@@ -71,7 +71,7 @@ publish-all-policies: validate-org
 	hzn exchange business addpolicy -f ./deployment/business-policy.json
 
 register-pattern: check-cam-url
-	hzn register --pattern "${HZN_ORG_ID}/pattern-yolocuda" --input-file ./deployment/input-file.json
+	hzn register --pattern "${HZN_ORG_ID}/pattern-yolocuda" --input-file ./deployment/input-file.json --policy=./deployment/privileged.json
 
 register-policy:
 	hzn register --policy ./deployment/example-node-policy.json
