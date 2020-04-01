@@ -6,6 +6,7 @@ SERVICE_VERSION:="1.0.0"
 # Get the Open-Horizon architecture type, and IP address for this host
 ARCH:=$(shell ../../helper -a)
 HOST_IP:=$(shell ../../helper -i)
+DEFAULT_CAM_URL:="http://${HOST_IP}:8888/"
 
 # If HZN_DEVICE_ID is not set, use the hostname
 HZN_DEVICE_ID := $(or $(HZN_DEVICE_ID),$(shell sh -c 'hostname'))
@@ -24,7 +25,7 @@ dev: build validate-dockerhubid check-cam-url
 	-docker rm -f ${SERVICE_NAME} 2>/dev/null || :
 	docker run -it -v `pwd`:/outside \
 	   -e HZN_DEVICE_ID="${HZN_DEVICE_ID}" \
-	   -e HOST_IP="${HOST_IP}" \
+	   -e DEFAULT_CAM_URL="${DEFAULT_CAM_URL}" \
 	   -e CAM_URL="${CAM_URL}" \
 	   -e EVENTSTREAMS_BROKER_URLS="${EVENTSTREAMS_BROKER_URLS}" \
 	   -e EVENTSTREAMS_API_KEY="${EVENTSTREAMS_API_KEY}" \
@@ -37,7 +38,7 @@ test: validate-dockerhubid check-cam-url
 	-docker rm -f ${SERVICE_NAME} 2>/dev/null || :
 	docker run --rm -d \
 	   -e HZN_DEVICE_ID="${HZN_DEVICE_ID}" \
-	   -e HOST_IP="${HOST_IP}" \
+	   -e DEFAULT_CAM_URL="${DEFAULT_CAM_URL}" \
 	   -e CAM_URL="${CAM_URL}" \
 	   -e EVENTSTREAMS_BROKER_URLS="${EVENTSTREAMS_BROKER_URLS}" \
 	   -e EVENTSTREAMS_API_KEY="${EVENTSTREAMS_API_KEY}" \
