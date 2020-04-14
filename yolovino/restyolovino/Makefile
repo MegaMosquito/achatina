@@ -24,6 +24,7 @@ dev: validate-dockerhubid
 	-docker rm -f $(SERVICE_NAME) 2>/dev/null || :
 	docker run -it \
 	  -p 5252:80 \
+	  --device /dev/dri \
 	  --name $(SERVICE_NAME) \
 	  --network mqtt-net --network-alias $(SERVICE_NAME) \
 	  -v `pwd`:/outside \
@@ -33,6 +34,7 @@ test: validate-dockerhubid
 	-docker rm -f $(SERVICE_NAME) 2>/dev/null || :
 	docker run --rm -d \
 	  -p 5252:80 \
+	  --device /dev/dri \
 	  --name $(SERVICE_NAME) \
 	  --network mqtt-net --network-alias $(SERVICE_NAME) \
 	  $(DOCKERHUB_ID)/$(SERVICE_NAME)_$(ARCH):$(SERVICE_VERSION)
