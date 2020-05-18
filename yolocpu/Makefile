@@ -1,11 +1,21 @@
 # A simple Makefile for the achatina YOLO CPU example
 
+build-local-services:
+	@echo "Building YOLO (for CPU) services for this architecture only..."
+	make -C restyolocpu build
+	make -C yolocpu build
+
+push-local-services:
+	@echo "Docker-pushing YOLO (for CPU) services for this architecture only..."
+	make -C restyolocpu push
+	make -C yolocpu push
+
 test: check-cam-url
 	@echo "Performing local test of the YOLO (for CPU) example..."
 	$(MAKE) -C ../shared test
-	$(MAKE) -C restyolocpu
+	$(MAKE) -C restyolocpu build
 	$(MAKE) -C restyolocpu test
-	$(MAKE) -C yolocpu
+	$(MAKE) -C yolocpu build
 	$(MAKE) -C yolocpu test
 
 clean:
@@ -33,14 +43,14 @@ deep-clean: clean stop
 #
 
 publish-local-services:
-	@echo "Building and publishing the local services for this architecture only..."
+	@echo "Publishing the local services for this architecture only..."
 	$(MAKE) -C restyolocpu publish-service
 	$(MAKE) -C yolocpu publish-service
 	@echo "  NOTE: the shared services must also be published (restcam, mqtt, monitor)."
 	@echo "  NOTE: after this, also please publish a pattern or policies."
 
 publish-all-services:
-	@echo "Building and publishing the local services for all architectures..."
+	@echo "Building, pushing, and publishing the local services for all architectures..."
 	$(MAKE) -C restyolocpu publish-all-services
 	$(MAKE) -C yolocpu publish-all-services
 	@echo "  NOTE: the shared services must also be published (restcam, mqtt, monitor)."
@@ -55,7 +65,10 @@ publish-all-policies: validate-org
 	hzn exchange business addpolicy -f ./deployment/business-policy.json
 
 register-pattern: check-cam-url
-	hzn register --pattern "${HZN_ORG_ID}/pattern-yolocpu" --input-file ./deployment/input-file.json
+	@if [ -n "${CAM_URL}" ]; \
+          then hzn register --pattern "${HZN_ORG_ID}/pattern-yolocpu" --input-file ./deployment/input-file.json --policy=./deployment/privileged.json; \
+          else echo "ERROR: 'CAM_URL' must be set for this pattern."; \
+	fi
 
 register-policy:
 	hzn register --policy ./deployment/example-node-policy.json

@@ -1,0 +1,70 @@
+FROM ubuntu:18.04
+USER root
+WORKDIR /
+RUN useradd -ms /bin/bash openvino && \
+    chown openvino -R /home/openvino
+ARG DEPENDENCIES="autoconf \
+                  automake \
+                  build-essential \
+                  cmake \
+                  cpio \
+                  curl \
+                  gnupg2 \
+                  libdrm2 \
+                  libglib2.0-0 \
+                  lsb-release \
+                  libgtk-3-0 \
+                  libtool \
+                  python3-pip \
+                  udev \
+                  unzip \
+                  libsm6 \
+                  libxext6 \
+                  libxrender-dev \
+                  libpython3.6"
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends ${DEPENDENCIES} && \
+    rm -rf /var/lib/apt/lists/*
+
+WORKDIR /tmp
+#ENV INSTALLDIR /opt/intel/openvino
+#ARG DOWNLOAD_LINK=http://registrationcenter-download.intel.com/akdlm/irc_nas/13231/l_openvino_toolkit_p_2019.0.000.tgz
+#RUN curl -LOJ "${DOWNLOAD_LINK}" && \
+#    tar -xzf ./*.tgz && \
+#    cd l_openvino_toolkit* && \
+#    sed -i 's/decline/accept/g' silent.cfg && \
+#    ./install.sh -s silent.cfg && \
+#    rm -rf /tmp/* && \
+#    $INSTALL_DIR/install_dependencies/install_openvino_dependencies.sh
+#ENV INSTALLDIR /opt/intel/openvino
+
+COPY ./l_openvino_toolkit_p_2020.1.023.tgz /
+RUN tar -xzf /*.tgz && \
+    cd /tmp/l_openvino_toolkit* && \
+    sed -i 's/decline/accept/g' silent.cfg && \
+    ./install.sh -s silent.cfg && \
+    rm -rf /tmp/* &&\
+    cd /opt/intel/openvino &&\
+    ./install_dependencies/install_openvino_dependencies.sh
+
+RUN usermod -aG video openvino
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends ocl-icd-libopencl1 && \
+    rm -rf /var/lib/apt/lists/* && \
+    dpkg -i /opt/intel/openvino/install_dependencies/*.deb && \
+    ldconfig
+
+RUN pip3 install opencv-python opencv-contrib-python
+
+COPY yolo-v2-tiny-ava-0001.xml /
+COPY yolo-v2-tiny-ava-0001.bin /
+COPY yolo-v2-tiny-ava-0001.labels /
+
+COPY mock.jpg /
+
+RUN cd /opt/intel/openvino/install_dependencies && /opt/intel/openvino/install_dependencies/install_openvino_dependencies.sh
+
+WORKDIR /opt/intel/openvino_2020.1.023/deployment_tools/inference_engine/samples/python/classification_sample
+
+CMD /bin/bash -c 'source /opt/intel/openvino/bin/setupvars.sh && python3 classification_sample.py -i /mock.jpg -m /yolo-v2-tiny-ava-0001.xml --labels /yolo-v2-tiny-ava-0001.labels'
+

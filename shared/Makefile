@@ -9,14 +9,26 @@ test:
 	make -C monitor
 	make -C monitor test
 
+build-local-services:
+	@echo "Building the shared services for this architecture only..."
+	make -C mqtt build
+	make -C restcam build
+	make -C monitor build
+
+push-local-services:
+	@echo "Docker-pushing the shared services for this architecture only..."
+	make -C mqtt push
+	make -C restcam push
+	make -C monitor push
+
 publish-local-services:
-	@echo "Building and publishing the shared services for this architecture only..."
+	@echo "Publishing the shared services for this architecture only..."
 	make -C mqtt publish-service
 	make -C restcam publish-service
 	make -C monitor publish-service
 
 publish-all-services:
-	@echo "Building and publishing all of the shared services for all architectures..."
+	@echo "Building, pushing and publishing all of the shared services for all architectures..."
 	make -C mqtt publish-all-services
 	make -C restcam publish-all-services
 	make -C monitor publish-all-services

@@ -10,6 +10,7 @@ EXAMPLE_URL = 'https://github.com/MegaMosquito/achatina/tree/master/yolocuda'
 
 import json
 import os
+import socket
 import subprocess
 import threading
 import time
@@ -27,28 +28,26 @@ def get_from_env(v, d):
 EVENTSTREAMS_BROKER_URLS = get_from_env('EVENTSTREAMS_BROKER_URLS', '')
 EVENTSTREAMS_API_KEY = get_from_env('EVENTSTREAMS_API_KEY', '')
 EVENTSTREAMS_PUB_TOPIC = get_from_env('EVENTSTREAMS_PUB_TOPIC', '')
+DEFAULT_CAM_URL = get_from_env('DEFAULT_CAM_URL', '')
 CAM_URL = get_from_env('CAM_URL', '')
 MQTT_PUB_TOPIC = get_from_env('MQTT_PUB_TOPIC', '/detect')
 DEFAULT_HZN_DEVICE_ID = '** NO DEVICE ID ** PUBLISHING TO KAFKA IS DISABLED **'
 HZN_DEVICE_ID = get_from_env('HZN_DEVICE_ID', DEFAULT_HZN_DEVICE_ID)
 
-
 # Try to compute some kind of value for the CAM URL if one was not provided
 if '' == CAM_URL:
-  host_ip = get_from_env('HOST_IP', '')
-  if '' != host_ip:
-    # Use the IP Address provided by the Makefile for dev purposes
-    CAM_URL = 'http://' + host_ip + ":8888/"
+  if '' != DEFAULT_CAM_URL:
+    # Use the IP Address provided by the Makefile (for dev purposes only)
+    CAM_URL = DEFAULT_CAM_URL
   else:
-    # If run by the Open-Horizon Agent, we should have this list of host IPs
-    hzn_host_ips = get_from_env('HZN_HOST_IPS', '')
-    if '' != hzn_host_ips:
-      # HACK! Blindly try the first IP address found (really hacky!)
-      CAM_URL = 'http://' + hzn_host_ips[0] + ":8888/"
-    else:
-      # If all else fails, just give them Albert
-      CAM_URL = 'https://upload.wikimedia.org/wikipedia/commons/6/6f/Einstein-formal_portrait-35.jpg'
-#print('CAM_URL = "' + CAM_URL + '"')
+    # If `restcam` is in Horizon requiredServices, then its name can be used
+    try:
+      addr = socket.gethostbyname('restcam')
+      CAM_URL = 'http://' + addr + ':8888/'
+    except:
+      # If all else fails, just give 'em Queen
+      CAM_URL = 'https://upload.wikimedia.org/wikipedia/commons/e/e7/QueenPerforming1977.jpg'
+#print('***** CAM_URL = "' + CAM_URL + '"')
 
 # Additional configuration constants
 TEMP_FILE = '/tmp/yolo.json'

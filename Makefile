@@ -20,10 +20,34 @@ test: test-yolocpu
 register-pattern: register-yolocpu-pattern
 register-policy: register-yolocpu-policy
 
+all-local:
+	@echo "Building, docker-pushing, and publishing everything for this architecture only..."
+	$(MAKE) build-local-services
+	$(MAKE) push-local-services
+	$(MAKE) publish-local-services
+	@echo "NOTE: after you have done this on each architecture, publish the pattern too."
+	@echo "      E.g.:  make publish-all-patterns"
+
+build-local-services:
+	@echo "Building the shared services..."
+	# Add additional makes here for any added examples
+	$(MAKE) -C shared build-local-services
+	@echo "Building the example services..."
+	$(MAKE) -C yolocpu build-local-services
+	$(MAKE) -C yolocuda build-local-services
+
+push-local-services:
+	@echo "Docker-pushing the shared services..."
+	$(MAKE) -C shared push-local-services
+	@echo "Docker-pushing the example services..."
+	$(MAKE) -C yolocpu push-local-services
+	$(MAKE) -C yolocuda push-local-services
+	# Add additional makes here for any added examples
+
 publish-local-services:
-	@echo "Building and publishing the shared services..."
+	@echo "Publishing the shared services..."
 	$(MAKE) -C shared publish-local-services
-	@echo "Building and publishing all the example services..."
+	@echo "Publishing all the example services..."
 	$(MAKE) -C yolocpu publish-local-services
 	$(MAKE) -C yolocuda publish-local-services
 	# Add additional makes here for any added examples

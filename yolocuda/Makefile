@@ -1,11 +1,25 @@
 # A simple Makefile for the achatina YOLO (CUDA) example
 
+build-local-services:
+	@echo "Building YOLO (for CUDA) services for this architecture only..."
+	@if [ "${ARCH}" != "arm" ]; then \
+          $(MAKE) -C restyolocuda build; \
+          $(MAKE) -C yolocuda build; \
+        fi
+
+push-local-services:
+	@echo "Docker-pushing YOLO (for CUDA) services for this architecture only..."
+	@if [ "${ARCH}" != "arm" ]; then \
+	  $(MAKE) -C restyolocuda push; \
+	  $(MAKE) -C yolocuda push; \
+        fi
+
 test: check-cam-url
 	@echo "Performing local test of the YOLO (for CUDA) example..."
 	$(MAKE) -C ../shared test
-	$(MAKE) -C restyolocuda
+	$(MAKE) -C restyolocuda build
 	$(MAKE) -C restyolocuda test
-	$(MAKE) -C yolocuda
+	$(MAKE) -C yolocuda build
 	$(MAKE) -C yolocuda test
 
 clean:
@@ -33,14 +47,16 @@ deep-clean: clean stop
 #
 
 publish-local-services:
-	@echo "Building and publishing the local services for this architecture only..."
-	$(MAKE) -C restyolocuda publish-service
-	$(MAKE) -C yolocuda publish-service
+	@echo "Publishing the local services for this architecture only..."
+	@if [ "${ARCH}" != "arm" ]; then \
+	  $(MAKE) -C restyolocuda publish-service; \
+	  $(MAKE) -C yolocuda publish-service; \
+        fi
 	@echo "  NOTE: the shared services must also be published (restcam, mqtt, monitor)."
 	@echo "  NOTE: after this, also please publish a pattern or policies."
 
 publish-all-services:
-	@echo "Building and publishing the local services for all architectures..."
+	@echo "Building, pushing, and publishing the local services for all architectures..."
 	$(MAKE) -C restyolocuda publish-all-services
 	$(MAKE) -C yolocuda publish-all-services
 	@echo "  NOTE: the shared services must also be published (restcam, mqtt, monitor)."
@@ -55,7 +71,10 @@ publish-all-policies: validate-org
 	hzn exchange business addpolicy -f ./deployment/business-policy.json
 
 register-pattern: check-cam-url
-	hzn register --pattern "${HZN_ORG_ID}/pattern-yolocuda --input-file ./deployment/input-file.json
+	@if [ -n "${CAM_URL}" ]; \
+          then hzn register --pattern "${HZN_ORG_ID}/pattern-yolocuda" --input-file ./deployment/input-file.json --policy=./deployment/privileged.json; \
+	  else echo "ERROR: 'CAM_URL' must be set for this pattern."; \
+	fi
 
 register-policy:
 	hzn register --policy ./deployment/example-node-policy.json
