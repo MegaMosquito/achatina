@@ -1,8 +1,11 @@
 FROM ubuntu:18.04
+ENV http_proxy $HTTP_PROXY
+ENV https_proxy $HTTP_PROXY
 USER root
 WORKDIR /
 RUN useradd -ms /bin/bash openvino && \
     chown openvino -R /home/openvino
+ARG INSTALL_DIR=/opt/intel/openvino
 ARG DEPENDENCIES="autoconf \
                   automake \
                   build-essential \
@@ -10,25 +13,30 @@ ARG DEPENDENCIES="autoconf \
                   cpio \
                   curl \
                   gnupg2 \
+		  wget \
                   libdrm2 \
                   libglib2.0-0 \
                   lsb-release \
                   libgtk-3-0 \
                   libtool \
                   python3-pip \
+                  python3-setuptools \
+                  python3-dev \
                   udev \
+                  libboost-filesystem1.65-dev \
+                  libboost-thread1.65-dev \
+                  libjson-c3 libxxf86vm-dev \
                   unzip"
+#    apt-get install -y --no-install-recommends ${DEPENDENCIES} && \
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends ${DEPENDENCIES} && \
+    apt-get install -y ${DEPENDENCIES} && \
     rm -rf /var/lib/apt/lists/*
 
-# [GD] I had to update this link
-ARG DOWNLOAD_LINK=http://registrationcenter-download.intel.com/akdlm/irc_nas/13231/l_openvino_toolkit_p_2020.1.023.tgz
+ARG DOWNLOAD_LINK=http://registrationcenter-download.intel.com/akdlm/irc_nas/16612/l_openvino_toolkit_p_2020.2.120.tgz
 
-# [GD] It seems this extra line is needed:
-ARG INSTALL_DIR=/opt/intel/openvino
 
 WORKDIR /tmp
+
 RUN curl -LOJ "${DOWNLOAD_LINK}" && \
     tar -xzf ./*.tgz && \
     cd l_openvino_toolkit* && \
@@ -36,16 +44,26 @@ RUN curl -LOJ "${DOWNLOAD_LINK}" && \
     ./install.sh -s silent.cfg && \
     rm -rf /tmp/* && \
     $INSTALL_DIR/install_dependencies/install_openvino_dependencies.sh
-ENV INSTALLDIR /opt/intel/openvino
 
-# [GD] Additions for VPU
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-        libboost-filesystem1.65-dev libboost-thread1.65-dev libjson-c3 libxxf86vm-dev && \
-    rm -rf /var/lib/apt/lists/*
+RUN echo "source $INSTALL_DIR/bin/setupvars.sh" >> /etc/bash.bashrc
 
-# [GD] This additional step seems to be required after all of the above
-RUN cd /opt/intel/openvino/install_dependencies && /opt/intel/openvino/install_dependencies/install_openvino_dependencies.sh
+# ==============================================================================
+# Build Inference Engine samples
+# ------------------------------------------------------------------------------
+RUN mkdir $INSTALL_DIR/deployment_tools/inference_engine/samples/cpp/build && \
+    cd $INSTALL_DIR/deployment_tools/inference_engine/samples/cpp/build && \
+    /bin/bash -c "source $INSTALL_DIR/bin/setupvars.sh && cmake .. && make -j4"
+
+# ==============================================================================
+# Build Inference Engine demos 
+# ------------------------------------------------------------------------------
+RUN mkdir $INSTALL_DIR/deployment_tools/inference_engine/demos/build && \
+    cd $INSTALL_DIR/deployment_tools/inference_engine/demos/build && \
+    /bin/bash -c "source $INSTALL_DIR/bin/setupvars.sh && cmake .. && make -j4"
+
+RUN pip3 install pyyaml requests numpy progress
+
+RUN python3 $INSTALL_DIR/deployment_tools/tools/model_downloader/downloader.py --name yolo-v2-tiny-ava-0001
 
 # [GD] Model config, weights, and labels
 COPY yolo-v2-tiny-ava-0001.xml /
@@ -55,7 +73,6 @@ COPY yolo-v2-tiny-ava-0001.labels /
 # [GD] My example image
 COPY mock.jpg /
 
-# [GD] Actually try to do something useful
-WORKDIR /opt/intel/openvino_2020.1.023/deployment_tools/inference_engine/samples/python/classification_sample
-CMD /bin/bash -c 'source /opt/intel/openvino/bin/setupvars.sh && python3 classification_sample.py -i /mock.jpg -m /yolo-v2-tiny-ava-0001.xml --labels /yolo-v2-tiny-ava-0001.labels'
+USER root
+CMD /bin/bash -c "source /opt/intel/openvino/bin/setupvars.sh && python3 /opt/intel/openvino_2020.2.120/deployment_tools/tools/benchmark_tool/benchmark_app.py -m /tmp/intel/yolo-v2-tiny-ava-0001/FP16/yolo-v2-tiny-ava-0001.xml -d HDDL"
 
