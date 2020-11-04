@@ -7,7 +7,9 @@
 # ./helper -g
 #   - returns the IP address of the first default gateway for this host
 # ./helper -i
-#   - returns one of the IP address on the first default interface for this host
+#   - returns an IP address on the first default interface for this host
+# ./helper -n
+#   - returns a name for this node (typiically `hostname`)
 # ./helper -z
 #   - returns all of the above (really just for development convenience)
 #
@@ -71,7 +73,14 @@ show_ip () {
   echo "${HOST_IP}"
 }
 
-while getopts ":agiz" opt; do
+# Return a name for this node
+show_name () {
+  if [ ${DEBUG} -gt 0 ]; then echo "Name."; fi
+  NAME=`hostname`
+  echo "${NAME}"
+}
+
+while getopts ":aginz" opt; do
   case ${opt} in
     a )
       show_architecture;
@@ -83,6 +92,10 @@ while getopts ":agiz" opt; do
       ;;
     i )
       show_ip;
+      exit 0;
+      ;;
+    n )
+      show_name;
       exit 0;
       ;;
     z )

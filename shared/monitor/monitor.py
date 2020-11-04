@@ -62,7 +62,9 @@ if __name__ == '__main__':
 
   @webapp.route("/")
   def get_results():
-    if None == last_detect: return '{"error":"Server not ready."}'
+    if None == last_detect:
+      now = datetime.now().strftime("%Y/%m/%d %-I:%M%p")
+      return '{"error":"' + now + ' -- No data yet."}'
     j = json.loads(last_detect)
     n = j['deviceid']
     c = len(j['detect']['entities'])
@@ -71,7 +73,7 @@ if __name__ == '__main__':
     s = j['source']
     u = j['source-url']
     # print(s, u)
-    kafka_msg = '<p> &nbsp; <em>NOTE:</em> Nothing is being published to EventStreams (kafka)!</p>\n'
+    kafka_msg = '<p> &nbsp; <em>NOTE:</em> Nothing is being published to Kafka!</p>\n'
     if 'kafka-sub' in j:
       sub = j['kafka-sub']
       kafka_msg = '<p> &nbsp; <em>NOTE:</em> This data is also being published to EventStreams (kafka). Subscribe with:</p>\n' + \
@@ -164,7 +166,7 @@ if __name__ == '__main__':
     r.headers['Cache-Control'] = 'public, max-age=0'
     return r
 
-  # Main program (instantiates and starts monitor threads and then web server)
+  # Main program (instantiates and starts monitor thread and then web server)
   monitor_detect = DetectThread()
   monitor_detect.start()
   webapp.run(host=FLASK_BIND_ADDRESS, port=FLASK_PORT)

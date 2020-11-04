@@ -1,0 +1,68 @@
+# Dockerfile from Sanjeev Gupta
+# Modified by Glen Darling, October 2020.
+#
+# Sanjeev's comments:
+# Major references
+# https://download.01.org/opencv/2020/openvinotoolkit/2020.1/open_model_zoo/
+# https://docs.openvinotoolkit.org/2020.4/openvino_docs_install_guides_installing_openvino_docker_linux.html
+# Goal of this dockerfile is to create image that will be used for inferencing. Original depedencies file
+# has been modified accordingly. TODO: Further trim docker image size
+#
+
+FROM balenalib/raspberrypi3
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    autoconf \
+    automake \
+    build-essential \
+    cpio \
+    cmake \
+    curl \
+    wget \
+    gnupg2 \
+    libdrm2 \
+    libglib2.0-0 \
+    libtool \
+    libgtk-3-0 \
+    libblas-dev liblapack-dev libatlas-base-dev \
+    gfortran \
+    udev \
+    unzip \
+    python3-pip \
+    python3-dev && \
+    rm -rf /var/lib/apt/lists/*
+    
+RUN mkdir -p /opt/intel/openvino && \
+    curl -SL https://download.01.org/opencv/2020/openvinotoolkit/2020.4/l_openvino_toolkit_runtime_raspbian_p_2020.4.287.tgz | tar -xzC /opt/intel/openvino --strip 1
+
+RUN python3.7 -m pip install --no-cache-dir \
+    py-cpuinfo \
+    numpy \
+    requests \
+    wheel \
+    flask && \
+    rm -rf /var/lib/apt/lists/*
+
+## NOT TO BE RUN in DOCKERFILE #########################
+# Build outside of the dockerfile on raspberry and then copy it here
+# How to build on raspberry
+# source /opt/intel/openvino/bin/setupvars.sh 
+# /opt/intel/openvino/install_dependencies/install_NCS_udev_rules.sh
+# mkdir build && cd build
+# cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS="-march=armv7-a" /opt/intel/openvino/deployment_tools/inference_engine/samples*/cpp*
+# make -j4 object_detection_sample_ssd
+# cd ..
+# ./build/armv7l/Release/object_detection_sample_ssd -m face-detection-adas-0001.xml -d MYRIAD -i multiple-facial-expression.jpg 
+## NOT TO BE RUN in DOCKERFILE #########################
+
+WORKDIR /
+COPY openvinoyolo.py /
+COPY logo.png /
+COPY mock.jpg /
+COPY model/openvino-yolo-v3.xml /
+COPY model/openvino-yolo-v3.bin /
+COPY model/openvino-yolo-v3.labels /
+
+CMD [ "/bin/bash", "-c", "source /opt/intel/openvino/bin/setupvars.sh ; /usr/bin/python3 /openvinoyolo.py /openvino-yolo-v3.xml /openvino-yolo-v3.bin /openvino-yolo-v3.labels" ]
+

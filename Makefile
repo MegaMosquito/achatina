@@ -1,123 +1,104 @@
 #
-# A simple top level Makefile for the achatina examples
+# A top level Makefile for the achatina examples
 #
-# Targets for dev and test:
-#   test                  (build and test an example locally)
-#   register-pattern      (register the host for an example using a pattern)
-#   register-policy       (register the host for an example using a policy)
-#   clean                 (stop and remove all of the example containers)
-#   stop                  (stop and remove all containers, except anax)
-#   deep-clean            (clean, stop, and also remove all container images except anax, and the docker network used for testing)
+# You must set the DOCKERHUB_ID environment variable before using this Makefile
 #
-# Targets for publishing to any Horizon Exchange
-#   publish-local-services  (build, push, and publish all of the services in all of the examples, for just the local architecture)
-#   publish-all-services  (build, push, and publish all of the services in all of the examples, for all supported architectures)
-#   publish-all-patterns  (publish all of the deployment patterns supported by all of the examples)
-#   publish-all-policies  (publish all of the business/deployment policies provided by all of the examples)
+# Targets provided:
+#   run             (build & test the CPU-only example -- should run anywhere)
+#   run-cuda        (build & test the CUDA example -- NVIDIA setup req'd)
+#   run-openvino    (build & test the OpenVino example -- Movidius setup req'd)
+#   build           (build the containers needed for the CPU example)
+#   build-cuda      (build the containers needed for the CUDA example)
+#   build-openvino  (build the containers needed for the OpenVino example)
+#   build-all       (build all of the example containers -- NVIDIA setup req'd)
+#   stop            (stop and remove all example containers)
+#   clean           (stop and remove all example containers, and their images)
+#   deep-clean      (cleanup docker, incl. all contaiiners, images, networks)
+#
+# Optionally configure an INPUT_URL in your environment. You have 3 choices:
+#   1. Don't set it and the "restcam" service or a static image will be used
+#   2. Provide a valid HTTP image URL. E.g.:
+#          https://commons.wikimedia.org/wiki/File:Example.jpg
+#   3. Provide a valid RTSP stream URL. E.g.:
+#           rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov
+#
+# If you wish to use the "restcam" (see shared/restcam) there are additional
+# enviropnment variables you may wish to set to configure that servcie.
+#
+# Optionally, you may configure a Kafka endpoint to receive the JSON output.
+# Don't set these if you do not wish to pubish to ia remote Kafka broker.
+# Enviroonment variables that must be set if you wish to publish to Kafka:
+#   KAFKA_BROKER_URLS, KAFKA_API_KEY, KAFKA_PUB_TOPIC
 #
 
-test: test-yolocpu
-register-pattern: register-yolocpu-pattern
-register-policy: register-yolocpu-policy
+# These statements will automatically configure some environment variables
+ARCH:=$(shell ../../helper -a)
+NODE:=$(shell ../../helper -n)
 
-all-local:
-	@echo "Building, docker-pushing, and publishing everything for this architecture only..."
-	$(MAKE) build-local-services
-	$(MAKE) push-local-services
-	$(MAKE) publish-local-services
-	@echo "NOTE: after you have done this on each architecture, publish the pattern too."
-	@echo "      E.g.:  make publish-all-patterns"
+run: run-cpu-only
+build: build-cpu-only
 
-build-local-services:
+run-cpu-only: build-cpu-only
+	@echo "Running the CPU-only version of the achatina application..."
+	$(MAKE) -C shared run
+	$(MAKE) -C plugins/cpu-only run
+	env ACHATINA_PLUGIN=cpu-only $(MAKE) -C achatina run
+
+run-cuda: build-cuda
+	@echo "Running the NVIDIA-accelerated version of the achatina application..."
+	$(MAKE) -C shared run
+	$(MAKE) -C plugins/cuda run
+	env ACHATINA_PLUGIN=cuda $(MAKE) -C achatina run
+
+run-openvino: build-openvino
+	@echo "Running the Movidius-accelerated version of the achatina application..."
+	$(MAKE) -C shared run
+	$(MAKE) -C plugins/openvino run
+	env ACHATINA_PLUGIN=openvino $(MAKE) -C achatina run
+
+build-shared-services:
 	@echo "Building the shared services..."
-	# Add additional makes here for any added examples
-	$(MAKE) -C shared build-local-services
-	@echo "Building the example services..."
-	$(MAKE) -C yolocpu build-local-services
-	$(MAKE) -C yolocuda build-local-services
+	$(MAKE) -C shared build
 
-push-local-services:
-	@echo "Docker-pushing the shared services..."
-	$(MAKE) -C shared push-local-services
-	@echo "Docker-pushing the example services..."
-	$(MAKE) -C yolocpu push-local-services
-	$(MAKE) -C yolocuda push-local-services
-	# Add additional makes here for any added examples
+build-cpu-only: build-shared-services
+	$(MAKE) -C plugins/cpu-only build
+	$(MAKE) -C achatina build
 
-publish-local-services:
-	@echo "Publishing the shared services..."
-	$(MAKE) -C shared publish-local-services
-	@echo "Publishing all the example services..."
-	$(MAKE) -C yolocpu publish-local-services
-	$(MAKE) -C yolocuda publish-local-services
-	# Add additional makes here for any added examples
+build-cuda: build-shared-services
+	$(MAKE) -C plugins/cuda build
+	$(MAKE) -C achatina build
 
-publish-all-services:
-	@echo "Building and publishing the shared services..."
-	$(MAKE) -C shared publish-all-services
-	@echo "Building and publishing all the example services..."
-	$(MAKE) -C yolocpu publish-all-services
-	$(MAKE) -C yolocuda publish-all-services
-	# Add additional makes here for any added examples
+build-openvino: build-shared-services
+	$(MAKE) -C plugins/openvino build
+	$(MAKE) -C achatina build
 
-publish-all-patterns:
-	@echo "Publishing the patterns for all of the examples..."
-	$(MAKE) -C yolocpu publish-all-patterns
-	$(MAKE) -C yolocuda publish-all-patterns
-	# Add additional makes here for any added examples
+build-all: build-shared-services
+	$(MAKE) -C plugins/cpu-only build
+	$(MAKE) -C plugins/cuda build
+	$(MAKE) -C plugins/openvino build
+	$(MAKE) -C achatina build
 
-publish-all-policies:
-	@echo "Publishing the business/deployment policies for all of the examples..."
-	$(MAKE) -C yolocpu publish-all-policies
-	$(MAKE) -C yolocuda publish-all-policies
-	# Add additional makes here for any added examples
+stop:
+	@echo "Stopping all example containers."
+	$(MAKE) -C shared stop
+	$(MAKE) -C plugins/cpu-only stop
+	$(MAKE) -C plugins/cuda stop
+	$(MAKE) -C plugins/openvino stop
+	$(MAKE) -C achatina stop
 
 clean:
+	@echo "Stopping all example containers and removing their images."
 	$(MAKE) -C shared clean
-	$(MAKE) -C yolocpu clean
-	$(MAKE) -C yolocuda clean
-	# Add additional makes here for any added examples
+	$(MAKE) -C plugins/cpu-only clean
+	$(MAKE) -C plugins/cuda clean
+	$(MAKE) -C plugins/openvino clean
+	$(MAKE) -C achatina clean
 
-ANAX_CONTAINER:=$(word 1, $(shell sh -c "docker ps | grep 'openhorizon/amd64_anax'"))
-EXTRA:=$(if $(ANAX_CONTAINER), | grep -v $(ANAX_CONTAINER), )
-stop:
-	@echo "Stopping and removing Docker containers."
-	-docker rm -f `docker ps -aq ${EXTRA}` 2>/dev/null || :
+deep-clean:
+	@echo "Removing all Docker running containers, all container images, and more."
+	-docker rm -f `docker ps -aq` 2>/dev/null || :
+	-docker rmi -f `docker images -aq` 2>/dev/null || :
+	-docker network prune || :
+	-docker volume prune || :
 
-ANAX_IMAGE:=$(word 3, $(shell sh -c "docker images | grep 'openhorizon/amd64_anax'"))
-foo:
-deep-clean: clean stop
-	@echo "Removing Docker container images."
-	-docker rmi -f `docker images -aq | grep -v "${ANAX_IMAGE}"` 2>/dev/null || :
-	@echo "Removing the Docker network used for testing."
-	-docker network rm mqtt-net 2>/dev/null || :
-
-.PHONY: test register-patter register-policy clean stop deep-clean publish-all-services publish-all-patterns publish-all-policies
-
-#
-# Provide convenience targets for any added examples here, if desired:
-#
-
-# YOLO for CPU
-test-yolocpu:
-	@echo "Performing  local test (outside of Horizon) for YOLOv3 (CPU)..."
-	$(MAKE) -C yolocpu test
-register-yolocpu-pattern:
-	$(MAKE) -C yolocpu register-pattern
-register-yolocpu-policy:
-	$(MAKE) -C yolocpu register-policy
-.PHONY: test-yolocpu register-yolocpu-pattern register-yolocpu-policy
-
-
-# YOLO for CUDA
-test-yolocuda:
-	@echo "Performing  local test (outside of Horizon) for YOLO (CUDA)..."
-	$(MAKE) -C yolocuda test
-register-yolocuda-pattern:
-	$(MAKE) -C yolocuda register-pattern
-register-yolocuda-policy:
-	$(MAKE) -C yolocuda register-policy
-.PHONY: test-yolocuda register-yolocuda-pattern register-yolocuda-policy
-
-
-
+.PHONY: run build run-cpu-only run-cuda run-openvino build-shared-services build-cpu-only build-cuda build-openvino build-all stop clean deep-clean

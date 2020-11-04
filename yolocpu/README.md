@@ -1,3 +1,0 @@
-# YOLO CPU Example
-
-Details coming soon...

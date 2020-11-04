@@ -1,0 +1,77 @@
+# Dockerfile from Sanjeev Gupta
+# Modified by Glen Darling, October 2020.
+
+# Major references
+#
+# https://download.01.org/opencv/2020/openvinotoolkit/2020.1/open_model_zoo/
+# https://docs.openvinotoolkit.org/2020.4/openvino_docs_install_guides_installing_openvino_docker_linux.html
+#
+# Goal of this dockerfile is to create image that will be used for inferencing. Original depedencies file
+# has been modified accordingly. TODO: Further trim docker image size
+#
+
+FROM ubuntu:18.04
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    autoconf \
+    automake \
+    build-essential \
+    libboost-all-dev \
+    libjson-c-dev \
+    cpio \
+    cmake \
+    curl \
+    wget \
+    gnupg2 \
+    libdrm2 \
+    libglib2.0-0 \
+    libtool \
+    libgtk-3-0 \
+    udev \
+    unzip \
+    python3-pip \
+    python3-dev && \
+    rm -rf /var/lib/apt/lists/*
+    
+WORKDIR /tmp/openvino_installer
+RUN mkdir -p /tmp/openvino_installer && \
+    curl -SL http://registrationcenter-download.intel.com/akdlm/irc_nas/16803/l_openvino_toolkit_p_2020.4.287.tgz | tar -xzC /tmp/openvino_installer --strip 1 && \
+    sed -i 's/decline/accept/g' silent.cfg && \
+    /tmp/openvino_installer/install.sh -s silent.cfg && \
+    rm -rf /var/lib/apt/lists/*
+
+COPY install_openvino_dependencies_custom.sh  /opt/intel/openvino/install_dependencies/install_openvino_dependencies_custom.sh
+RUN /opt/intel/openvino/install_dependencies/install_openvino_dependencies_custom.sh && \
+    rm -rf /var/lib/apt/lists/*
+
+WORKDIR /tmp
+RUN rm -rf /tmp/openvino_installer/
+
+RUN python3.6 -m pip install --no-cache-dir setuptools scikit-build && \
+    python3.6 -m pip install --no-cache-dir \
+    py-cpuinfo \
+    numpy \
+    progress \
+    opencv-python && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN pip3 install requests
+
+RUN if [ -f "/opt/intel/openvino/bin/setupvars.sh" ]; then \
+        printf "\nsource /opt/intel/openvino/bin/setupvars.sh\n" >> /home/openvino/.bashrc; \
+        printf "\nsource /opt/intel/openvino/bin/setupvars.sh\n" >> /root/.bashrc; \
+    fi;
+
+RUN pip3 install wheel
+RUN pip3 install flask
+    
+WORKDIR /
+COPY openvinoyolo.py /
+COPY logo.png /
+COPY mock.jpg /
+COPY model/openvino-yolo-v3.xml /
+COPY model/openvino-yolo-v3.bin /
+COPY model/openvino-yolo-v3.labels /
+
+CMD [ "/bin/bash", "-c", "source /opt/intel/openvino/bin/setupvars.sh ; /usr/bin/python3 /openvinoyolo.py /openvino-yolo-v3.xml /openvino-yolo-v3.bin /openvino-yolo-v3.labels" ]

@@ -1,100 +1,72 @@
-# A simple local MQTT broker for inter-service communication
+#
+# mqtt
+#
+# This container provides a basic MQTT broker that I use for *insecure*
+# local (within a host only) inter-service communication.i
+#
+# Here I expose the *insecure* MQTT broker service port (1883) on the host
+# loopback interface only (127.0.0.1). This broker is therefore accessible
+# only by locally running host processes. I also bind this service to an
+# interface on the Docker bridge network named "mqtt-net". You can therefore
+# use this broker for inter-service communication on the host, by adding your
+# containers to the "mqtt-net" bridge network. Once you do that you will be
+# able to use the network name "mqtt" to access the broker on this network.
+#
+# NOTE: If you wish to use this broker for communication between hosts, and
+# you therefore plan to expose service ports on the host network, then you
+# would be wise to require user authentication, and expose only the MQTT
+# broker's secure port (8883).
+#
+# Written by Glen Darling, Oct 2020.
+#
 
+# Include the make file containing all the check-* targets
+include ../../checks.mk
+
+# Give this service a name and version number
 SERVICE_NAME:="mqtt"
-SERVICE_VERSION:="1.0.0"
+SERVICE_VERSION:="1.1.0"
 
-# Get the Open-Horizon architecture type, and IP address for this host
+# These statements automatically configure some environment variables
 ARCH:=$(shell ../../helper -a)
 
-#
-# Targets for building, testing and cleaning this service
-#
-
-build: validate-dockerhubid
+build: check-dockerhubid
 	docker build -t $(DOCKERHUB_ID)/$(SERVICE_NAME)_$(ARCH):$(SERVICE_VERSION) -f ./Dockerfile.$(ARCH) .
 
-push: validate-dockerhubid
-	docker push $(DOCKERHUB_ID)/$(SERVICE_NAME)_$(ARCH):$(SERVICE_VERSION)
+run: check-dockerhubid
+	-docker network create mqtt-net 2>/dev/null || :
+	-docker rm -f $(SERVICE_NAME) 2>/dev/null || :
+	docker run --rm -d \
+           -p 127.0.0.1:1883:1883 \
+           --name $(SERVICE_NAME) \
+           --network mqtt-net --network-alias $(SERVICE_NAME) \
+           $(DOCKERHUB_ID)/$(SERVICE_NAME)_$(ARCH):$(SERVICE_VERSION)
 
-# How to perform a quick self-test of the MQTT broker
-# - Verified on ubuntu and Rapsbian
-# - NOTE: requires `mosquito-clients` package to be installed on the host
-# - do this to test:
-#    1. start a broker instance: `make test`
+
+# =============================================================================
+# To perform a quick self-test of the "mqtt" service:
+#    0. Install the "mosquito-clients" package on the local host. E.g.:
+#       sudo apt update && sudo apt install -y mosquitto-clients
+#    1. start an "mqtt" service instance: `make run`
 #    2. in one terminal on the host, subscribe with: `make test-sub`
 #    3. then in another termninal on the host, publish with: `make test-pub`
-#    4. You should see `Hello, world.` appear in the subscribed terminal
-#    5. Terminate the subscriber with Ctrl-C, then: `make test-end`
-test: validate-dockerhubid
-	@docker network create mqtt-net 2>/dev/null || :
-	-docker rm -f $(SERVICE_NAME) 2>/dev/null || :
-	docker run --rm -d -p 127.0.0.1:1883:1883 --name $(SERVICE_NAME) --network mqtt-net --network-alias $(SERVICE_NAME) $(DOCKERHUB_ID)/$(SERVICE_NAME)_$(ARCH):$(SERVICE_VERSION)
+#    4. you should see `Hello, world.` appear in the subscribed terminal
+#    5. terminate the subscriber with Ctrl-C, then: `make stop`
+# =============================================================================
+test: test-sub
 test-sub:
-	mosquitto_sub -h 127.0.0.1 -p 1883 -t /foo
+	mosquitto_sub -h 127.0.0.1 -p 1883 -t /detect
 test-pub:
-	mosquitto_pub -h 127.0.0.1 -p 1883 -t /foo -m 'Hello, world.'
-test-end:
-	-docker rm -f $(SERVICE_NAME)
-
-clean: validate-dockerhubid
-	@docker rm -f ${SERVICE_NAME} 2>/dev/null || :
-	@docker rmi $(DOCKERHUB_ID)/$(SERVICE_NAME):$(SERVICE_VERSION) 2>/dev/null || :
-	@docker rmi $(DOCKERHUB_ID)/$(SERVICE_NAME)_$(ARCH):$(SERVICE_VERSION) 2>/dev/null || :
-
-#
-# Targets for publishing this service to an Open-Horizon Exhange
-#
-# NOTE: You must install the Open-Horizon CLI in order to use these targets!
-#
-
-publish-service: validate-dockerhubid validate-org
-	ARCH=$(ARCH) \
-          SERVICE_NAME="$(SERVICE_NAME)" \
-          SERVICE_VERSION="$(SERVICE_VERSION)"\
-          DOCKER_IMAGE_BASE="$(DOCKERHUB_ID)/$(SERVICE_NAME)"\
-          hzn exchange service publish -O -f service.json --pull-image
-
-publish-all-services: validate-dockerhubid validate-org
-	docker build -t $(DOCKERHUB_ID)/$(SERVICE_NAME)_arm:$(SERVICE_VERSION) -f ./Dockerfile.arm .
-	docker push $(DOCKERHUB_ID)/$(SERVICE_NAME)_arm:$(SERVICE_VERSION)
-	ARCH=arm \
-          SERVICE_NAME="$(SERVICE_NAME)" \
-          SERVICE_VERSION="$(SERVICE_VERSION)"\
-          DOCKER_IMAGE_BASE="$(DOCKERHUB_ID)/$(SERVICE_NAME)"\
-          hzn exchange service publish -O -f service.json --pull-image
-	docker build -t $(DOCKERHUB_ID)/$(SERVICE_NAME)_arm64:$(SERVICE_VERSION) -f ./Dockerfile.arm64 .
-	docker push $(DOCKERHUB_ID)/$(SERVICE_NAME)_arm64:$(SERVICE_VERSION)
-	ARCH=arm64 \
-          SERVICE_NAME="$(SERVICE_NAME)" \
-          SERVICE_VERSION="$(SERVICE_VERSION)"\
-          DOCKER_IMAGE_BASE="$(DOCKERHUB_ID)/$(SERVICE_NAME)"\
-          hzn exchange service publish -O -f service.json --pull-image
-	docker build -t $(DOCKERHUB_ID)/$(SERVICE_NAME)_amd64:$(SERVICE_VERSION) -f ./Dockerfile.amd64 .
-	docker push $(DOCKERHUB_ID)/$(SERVICE_NAME)_amd64:$(SERVICE_VERSION)
-	ARCH=amd64 \
-          SERVICE_NAME="$(SERVICE_NAME)" \
-          SERVICE_VERSION="$(SERVICE_VERSION)"\
-          DOCKER_IMAGE_BASE="$(DOCKERHUB_ID)/$(SERVICE_NAME)"\
-          hzn exchange service publish -O -f service.json --pull-image
-
-#
-# Sanity check targets
-#
-
-validate-dockerhubid:
-	@if [ -z "${DOCKERHUB_ID}" ]; \
-          then { echo "***** ERROR: \"DOCKERHUB_ID\" is not set!"; exit 1; }; \
-          else echo "  NOTE: Using DockerHubID: \"${DOCKERHUB_ID}\""; \
-        fi
-	@sleep 1
-
-validate-org:
-	@if [ -z "${HZN_ORG_ID}" ]; \
-          then { echo "***** ERROR: \"HZN_ORG_ID\" is not set!"; exit 1; }; \
-          else echo "  NOTE: Using Exchange Org ID: \"${HZN_ORG_ID}\""; \
-        fi
-	@sleep 1
+	mosquitto_pub -h 127.0.0.1 -p 1883 -t /detect -m 'Hello, world.'
 
 
-.PHONY: build test test-sub test-pub test-end clean publish-service publish-all-services validate-dockerhubid validate-org
+stop: check-dockerhubid
+	-docker rm -f ${SERVICE_NAME} 2>/dev/null || :
+
+clean: check-dockerhubid
+	-docker rm -f ${SERVICE_NAME} 2>/dev/null || :
+	-docker rmi $(DOCKERHUB_ID)/$(SERVICE_NAME)_$(ARCH):$(SERVICE_VERSION) 2>/dev/null || :
+	-docker network rm mqtt-net 2>/dev/null || :
+
+.PHONY: build run test test-sub test-pub stop clean
 

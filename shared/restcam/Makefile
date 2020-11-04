@@ -1,108 +1,99 @@
-# A simple local MQTT broker for Horizon servcies to use
+#
+# restcam
+#
+# This container provides a basic REST camera service. It leverages the
+# "fswebcam" (http://manpages.ubuntu.com/manpages/bionic/man1/fswebcam.1.html)
+# utility to access a local camera, and provide images over HTTP. If anything
+# goes wrong with the camera access, a static image of a few people is
+# provided instead.
+#
+# The "restcam" contaiiner provides service on port 80. I also expose this
+# service on the host loopback interface (127.0.0.1) at port 8888. Locally
+# running host processes can access the service using the loopback. I also
+# bind to an interface on the Docker bridge network named "cam-net". You
+# can therefore also use this camera service from other running containers
+# by attaching them to the "cam-net" bridge network. Once you do that you
+# will be able to use the network name "restcam" to access the camera
+# service on port 80 there.
+#
+# Note that fswebcam is painfully slow (often taking several seconds to
+# return a single image).
+#
+# Written by Glen Darling, Oct 2020.
+#
+
+# Include the make file containing all the check-* targets
+include ../../checks.mk
 
 SERVICE_NAME:="restcam"
-SERVICE_VERSION:="1.0.0"
+SERVICE_VERSION:="1.1.0"
 
-# Get the Open-Horizon architecture type, and IP address for this host
+# These statements automatically configure some environment variables
 ARCH:=$(shell ../../helper -a)
 
-#
-# Targets for building, developing, testing and cleaning this service
-#
+# Optionally configure a camera device address in CAM_DEVICE in your shell
+# environment. The line below just configues a default camera device address to
+# be the standard default Video-4-Linux-v2 (V4L2) camera device address. This
+# default will only be used if CAM_DEVICE is not set in your environment.
+DEFAULT_CAM_DEVICE:="V4L2:/dev/video0"
 
-build: validate-dockerhubid
+# You may also optionally define these variables in your shell environment:
+#     CAM_DELAY_SEC, CAM_OUT_WIDTH, CAM_OUT_HEIGHT
+# See the "cam.sh" file to see how these are passed to "fswebcam", and see the
+# fswebcam documentation to see how they are used.
+
+build: check-dockerhubid
 	docker build -t $(DOCKERHUB_ID)/$(SERVICE_NAME)_$(ARCH):$(SERVICE_VERSION) -f ./Dockerfile.$(ARCH) .
 
-push: validate-dockerhubid
-	docker push $(DOCKERHUB_ID)/$(SERVICE_NAME)_$(ARCH):$(SERVICE_VERSION)
-
-dev: validate-dockerhubid
-	-docker network create mqtt-net 2>/dev/null || :
-	-docker rm -f $(SERVICE_NAME) 2>/dev/null || :
-	docker run -it -v `pwd`:/outside \
-           -p 8888:80 \
-           --privileged \
-           -e CAM_DEVICE="V4L2:/dev/video0" \
-           --name ${SERVICE_NAME} \
-           --network mqtt-net --network-alias ${SERVICE_NAME} \
-           $(DOCKERHUB_ID)/$(SERVICE_NAME)_$(ARCH):$(SERVICE_VERSION) /bin/bash
-
-test: validate-dockerhubid
-	-docker network create mqtt-net 2>/dev/null || :
+run: check-dockerhubid
+	-docker network create cam-net 2>/dev/null || :
 	-docker rm -f $(SERVICE_NAME) 2>/dev/null || :
 	docker run -d \
-           -p 8888:80 \
+           -p 127.0.0.1:8888:80 \
            --privileged \
-           -e CAM_DEVICE="V4L2:/dev/video0" \
+           -e CAM_DEVICE=$(if $(CAM_DEVICE),$(CAM_DEVICE),$(DEFAULT_CAM_DEVICE)) \
+           -e CAM_DELAY_SEC="${CAM_DELAY_SEC}" \
+           -e CAM_OUT_WIDTH="${CAM_OUT_WIDTH}" \
+           -e CAM_OUT_HEIGHT="${CAM_OUT_HEIGHT}" \
            --name ${SERVICE_NAME} \
-           --network mqtt-net --network-alias ${SERVICE_NAME} \
+           --network cam-net --network-alias $(SERVICE_NAME) \
            $(DOCKERHUB_ID)/$(SERVICE_NAME)_$(ARCH):$(SERVICE_VERSION)
 
-test-get:
-	curl -sS localhost:8888 | jq --raw-output --join-output '.cam.image' | base64 -d > foo.jpg
+# This target mounts this code dir in the container, useful for development.
+dev: check-dockerhubid build
+	-docker network create cam-net 2>/dev/null || :
+	-docker rm -f $(SERVICE_NAME) 2>/dev/null || :
+	docker run -it -v `pwd`:/outside \
+           -p 127.0.0.1:8888:80 \
+           --privileged \
+           -e CAM_DEVICE=$(if $(CAM_DEVICE),$(CAM_DEVICE),$(DEFAULT_CAM_DEVICE)) \
+           -e CAM_DELAY_SEC="${CAM_DELAY_SEC}" \
+           -e CAM_OUT_WIDTH="${CAM_OUT_WIDTH}" \
+           -e CAM_OUT_HEIGHT="${CAM_OUT_HEIGHT}" \
+           --name ${SERVICE_NAME} \
+           --network cam-net --network-alias $(SERVICE_NAME) \
+           $(DOCKERHUB_ID)/$(SERVICE_NAME)_$(ARCH):$(SERVICE_VERSION) /bin/bash
 
-test-end:
-	-docker rm -f $(SERVICE_NAME)
+# =============================================================================
+# To perform a quick self-test of the "restcam" service:
+#    1. start a "restcam" service instance: `make run`
+#    2. in a terminal on the host, HTTP GET a test image: `make test`
+#    3. you should see the file "test.jpg" appear in this directory
+#    4. optionally inspect the "test.jpg" file in a browser or iimage viewer
+#    5. terminate the "restcam" service: `make stop`
+# =============================================================================
+test:
+	@echo "Attempting to retrieve an image from the REST service..."
+	curl -sS http://localhost:8888/ > ./test.jpg
+	-ls -l ./test.jpg
 
-clean: validate-dockerhubid
+stop: check-dockerhubid
 	@docker rm -f ${SERVICE_NAME} 2>/dev/null || :
-	@docker rmi $(DOCKERHUB_ID)/$(SERVICE_NAME):$(SERVICE_VERSION) 2>/dev/null || :
-	@docker rmi $(DOCKERHUB_ID)/$(SERVICE_NAME)_$(ARCH):$(SERVICE_VERSION) 2>/dev/null || :
 
-#
-# Targets for publishing this service to an Open-Horizon Exhange
-#
-# NOTE: You must install the Open-Horizon CLI in order to use these targets!
-#
+clean: check-dockerhubid
+	-docker rm -f ${SERVICE_NAME} 2>/dev/null || :
+	-docker rmi $(DOCKERHUB_ID)/$(SERVICE_NAME)_$(ARCH):$(SERVICE_VERSION) 2>/dev/null || :
+        -docker network rm cam-net 2>/dev/null || :
 
-publish-service: validate-dockerhubid validate-org
-	ARCH=$(ARCH) \
-          SERVICE_NAME="$(SERVICE_NAME)" \
-          SERVICE_VERSION="$(SERVICE_VERSION)"\
-          DOCKER_IMAGE_BASE="$(DOCKERHUB_ID)/$(SERVICE_NAME)"\
-          hzn exchange service publish -O -f service.json --pull-image
-
-publish-all-services: validate-dockerhubid validate-org
-	docker build -t $(DOCKERHUB_ID)/$(SERVICE_NAME)_arm:$(SERVICE_VERSION) -f ./Dockerfile.arm .
-	docker push $(DOCKERHUB_ID)/$(SERVICE_NAME)_arm:$(SERVICE_VERSION)
-	ARCH=arm \
-          SERVICE_NAME="$(SERVICE_NAME)" \
-          SERVICE_VERSION="$(SERVICE_VERSION)"\
-          DOCKER_IMAGE_BASE="$(DOCKERHUB_ID)/$(SERVICE_NAME)"\
-          hzn exchange service publish -O -f service.json --pull-image
-	docker build -t $(DOCKERHUB_ID)/$(SERVICE_NAME)_arm64:$(SERVICE_VERSION) -f ./Dockerfile.arm64 .
-	docker push $(DOCKERHUB_ID)/$(SERVICE_NAME)_arm64:$(SERVICE_VERSION)
-	ARCH=arm64 \
-          SERVICE_NAME="$(SERVICE_NAME)" \
-          SERVICE_VERSION="$(SERVICE_VERSION)"\
-          DOCKER_IMAGE_BASE="$(DOCKERHUB_ID)/$(SERVICE_NAME)"\
-          hzn exchange service publish -O -f service.json --pull-image
-	docker build -t $(DOCKERHUB_ID)/$(SERVICE_NAME)_amd64:$(SERVICE_VERSION) -f ./Dockerfile.amd64 .
-	docker push $(DOCKERHUB_ID)/$(SERVICE_NAME)_amd64:$(SERVICE_VERSION)
-	ARCH=amd64 \
-          SERVICE_NAME="$(SERVICE_NAME)" \
-          SERVICE_VERSION="$(SERVICE_VERSION)"\
-          DOCKER_IMAGE_BASE="$(DOCKERHUB_ID)/$(SERVICE_NAME)"\
-          hzn exchange service publish -O -f service.json --pull-image
-
-#
-# Sanity check targets
-#
-
-validate-dockerhubid:
-	@if [ -z "${DOCKERHUB_ID}" ]; \
-          then { echo "***** ERROR: \"DOCKERHUB_ID\" is not set!"; exit 1; }; \
-          else echo "  NOTE: Using DockerHubID: \"${DOCKERHUB_ID}\""; \
-        fi
-	@sleep 1
-
-validate-org:
-	@if [ -z "${HZN_ORG_ID}" ]; \
-          then { echo "***** ERROR: \"HZN_ORG_ID\" is not set!"; exit 1; }; \
-          else echo "  NOTE: Using Exchange Org ID: \"${HZN_ORG_ID}\""; \
-        fi
-	@sleep 1
-
-
-.PHONY: build dev test test-get test-end clean publish-service publish-all-services validate-dockerhubid validate-org
+.PHONY: build run dev test stop clean
 
