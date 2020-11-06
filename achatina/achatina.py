@@ -86,7 +86,7 @@ LOG_SLEEP = False
 
 if __name__ == '__main__':
   while True:
-    #try:
+    try:
       # Request one run from the plugin REST service...
       if LOG_DETAIL:
         print('\nInitiating a request...')
@@ -133,9 +133,9 @@ if __name__ == '__main__':
         if LOG_DETAIL: print('--> MQTT: ' + MQTT_PUB_COMMAND + TEMP_FILE)
         discard = subprocess.run(MQTT_PUB_COMMAND + TEMP_FILE, shell=True)
 
-    #except:
-    #  if LOG_EXCEPT: print('*** Exception in main achatina loop! ***')
-    #  pass
+    except:
+      if LOG_EXCEPT: print('*** Exception in main achatina loop! ***')
+      pass
 
     # Pause briefly (to not hog the CPU too much on small machines)
       if LOG_SLEEP: print('Sleeping for ' + str(SLEEP_BETWEEN_CALLS) + ' seconds...')
