@@ -9,17 +9,7 @@ SERVICE_VERSION:="1.1.0"
 # These statements automatically configure some environment variables
 ARCH:=$(shell ../../helper -a)
 
-# Download the OpenVino Yolo-V3 ML model
-openvino-yolo-v3.zip:
-	wget https://ibm.box.com/shared/static/3qn6jcvgqdrq3prspfrvp0tg8or85j7v.zip -O openvino-yolo-v3.zip
-
-# Extract the model files from the zip archive
-openvino-yolo-v3.xml: openvino-yolo-v3.zip
-openvino-yolo-v3.bin: openvino-yolo-v3.zip
-openvino-yolo-v3.labels: openvino-yolo-v3.zip
-	unzip -j openvino-yolo-v3.zip
-
-build: check-dockerhubid openvino-yolo-v3.xml openvino-yolo-v3.bin openvino-yolo-v3.labels
+build: check-dockerhubid
 	@echo "Building the OpenVino plugin for Movidius hardware"
 	docker build -t $(DOCKERHUB_ID)/$(SERVICE_NAME)_$(ARCH):$(SERVICE_VERSION) -f ./Dockerfile.$(ARCH) .; \
 

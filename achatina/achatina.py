@@ -58,11 +58,12 @@ print('achatina: INPUT_URL="%s"' % INPUT_URL)
 print('achatina: NODE="%s"' % NODE)
 
 # Configuration constants
+# PLUGIN_URL is tricky because openvino unfortunately requires --net=host
+if 'ACHATINA_PLUGIN' in os.environ and 'openvino' != os.environ['ACHATINA_PLUGIN']:
+  PLUGIN_URL = ('http://%s:80/detect?url=%s' % (HOST_IP, urllib.parse.quote(INPUT_URL)))
+else:
+  PLUGIN_URL = ('http://%s:80/detect?url=%s' % (ACHATINA_PLUGIN, urllib.parse.quote(INPUT_URL)))
 TEMP_FILE = '/tmp/achatina.json'
-# This assignment is tricky because openvino unfortunately requires --net=host
-PLUGIN_URL = ('http://%s:80/detect?url=%s' % ( \
-  (ACHATINA_PLUGIN if 'openvino' != ACHATINA_PLUGIN else HOST_IP), \
-  urllib.parse.quote(INPUT_URL)))
 MQTT_PUB_COMMAND = ('mosquitto_pub -h %s -p %s -t %s -f ' % (MQTT_BROKER_ADDRESS, MQTT_BROKER_PORT, MQTT_PUB_TOPIC))
 if '' != KAFKA_BROKER_URLS and '' != KAFKA_API_KEY and '' != KAFKA_PUB_TOPIC:
   KAFKA_PUB_COMMAND = 'kafkacat -P -b ' + KAFKA_BROKER_URLS + ' -X api.version.request=true -X security.protocol=sasl_ssl -X sasl.mechanisms=PLAIN -X sasl.username=token -X sasl.password="' + KAFKA_API_KEY + '" -t ' + KAFKA_PUB_TOPIC + ' '

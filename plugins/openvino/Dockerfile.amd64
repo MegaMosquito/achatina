@@ -70,8 +70,6 @@ WORKDIR /
 COPY openvinoyolo.py /
 COPY logo.png /
 COPY mock.jpg /
-COPY openvino-yolo-v3.xml /
-COPY openvino-yolo-v3.bin /
-COPY openvino-yolo-v3.labels /
+RUN wget -O openvino-yolo-v3.zip https://ibm.box.com/shared/static/3qn6jcvgqdrq3prspfrvp0tg8or85j7v.zip && unzip -j openvino-yolo-v3.zip
 
 CMD [ "/bin/bash", "-c", "source /opt/intel/openvino/bin/setupvars.sh ; /usr/bin/python3 /openvinoyolo.py /openvino-yolo-v3.xml /openvino-yolo-v3.bin /openvino-yolo-v3.labels" ]

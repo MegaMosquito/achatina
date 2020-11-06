@@ -242,6 +242,8 @@ if __name__ == '__main__':
     print(request.args)
     kind = request.args.get('kind', '')
     url = request.args.get('url', '')
+    if '' == url:
+      return('{"error": "URL not provided."}\n', 400)
     print("URL is:   %s" % url)
     user = request.args.get('user', '')
     password = request.args.get('password', '')
