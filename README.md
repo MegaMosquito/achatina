@@ -41,7 +41,7 @@ Many of the examples use the following 3 shared service containers:
 
 (Optional. Not needed if you want to use some other camera service)
 
-All of these examples are also designed to make use of a camera, or a webcam. By default they try to use the local [restcam](https://github.com/MegaMosquito/achatina/tree/master/shared/restcam) shared service and it, in turn, uses the popular [fswebcam](https://github.com/fsphil/fswebcam) software to view the world through your camera. If image retrieval fails (e.g., if you don't have a camera attached) the raw original of the image above (before inferencing, and without any bounding boxes, laebls, etc.) will be provided by the `restcam` service. The `restcam` service provides images in the form of an image file, suitable for embedding in an HTML document. So you can easilt replace the `restcam` service with another image source anywhere on your LAN or even out on the Internet.
+All of these examples are also designed to make use of a camera, or a webcam. By default they try to use the local [restcam](https://github.com/MegaMosquito/achatina/tree/master/shared/restcam) shared service and it, in turn, uses the popular [fswebcam](https://github.com/fsphil/fswebcam) software to view the world through your camera. If image retrieval fails (e.g., if you don't have a camera attached) the raw original of the image above (before inferencing, and without any bounding boxes, labels, etc.) will be provided by the `restcam` service. The `restcam` service provides images in the form of an image file, suitable for embedding in an HTML document. So you can easilt replace the `restcam` service with another image source anywhere on your LAN or even out on the Internet.
 
 ### Shared Service -- mqtt
 
