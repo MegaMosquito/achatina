@@ -38,7 +38,7 @@ NODE:=$(shell ../../helper -n)
 run: run-cpu-only
 build: build-cpu-only
 
-run-shared-services: buiild-shared-services
+run-shared-services: build-shared-services
 	$(MAKE) -C shared/mqtt run
 	$(MAKE) -C shared/restcam run
 	$(MAKE) -C shared/monitor run
