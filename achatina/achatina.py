@@ -138,5 +138,5 @@ if __name__ == '__main__':
       pass
 
     # Pause briefly (to not hog the CPU too much on small machines)
-      if LOG_SLEEP: print('Sleeping for ' + str(SLEEP_BETWEEN_CALLS) + ' seconds...')
-      time.sleep(SLEEP_BETWEEN_CALLS)
+    if LOG_SLEEP: print('Sleeping for ' + str(SLEEP_BETWEEN_CALLS) + ' seconds...')
+    time.sleep(SLEEP_BETWEEN_CALLS)
