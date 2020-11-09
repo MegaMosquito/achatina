@@ -59,7 +59,7 @@ print('achatina: NODE="%s"' % NODE)
 
 # Configuration constants
 # PLUGIN_URL is tricky because openvino unfortunately requires --net=host
-if 'ACHATINA_PLUGIN' in os.environ and 'openvino' != os.environ['ACHATINA_PLUGIN']:
+if 'ACHATINA_PLUGIN' in os.environ and 'openvino' == os.environ['ACHATINA_PLUGIN']:
   PLUGIN_URL = ('http://%s:80/detect?url=%s' % (HOST_IP, urllib.parse.quote(INPUT_URL)))
 else:
   PLUGIN_URL = ('http://%s:80/detect?url=%s' % (ACHATINA_PLUGIN, urllib.parse.quote(INPUT_URL)))
