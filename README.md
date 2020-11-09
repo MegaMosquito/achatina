@@ -10,6 +10,7 @@ Most of the code is written in Python because this language is both popular and 
 
 The enclosed documentation gives a high level overview for the architecture, and details the contributions of the individual microservice components. These microservices include the top level program container, `achatina`, 3 different visual inferencing "plugin" containers, and 3 shared services containers that support achatina. Plugins do the interesting work and they can stand alone if desired (i.e., all of the others are optional, depending upon your needs). The Dockerfiles, Makefiles, and source code files here contain important details not in the `README.md` files. Here is a map of the key documents:
 
+```
 ├── README.md ................. the document you are reading!
 ├── Makefile .................. mostly this Makefile runs make in the subdirs
 ├── checks.mk ................. a Makefile fragment to check your env variables
@@ -53,6 +54,7 @@ The enclosed documentation gives a high level overview for the architecture, and
         ├── Dockerfile.* ...... ubuntu Dockerfiles for restcam (all arches)
         ├── cam.sh ............ 35 line (bash) `fswebcam` camera web service
         └── start.sh .......... 3 line script to launch cam.sh
+```
 
 ## Object Detection and Classification
 
