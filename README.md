@@ -2,7 +2,57 @@
 
 Achatina is a slowly evolving set of examples that do visual inferencing using Docker containers on small computers, usually relatively slowly.
 
-One of my goals for achatina is to make everything here *easily understandable*. To that end, almost all of the code files in the examples provided here have fewer than 100 lines. As a former teacher of university Computer Science courses for many years, I found that keeping examples to this size enables most people to understand them quickly. Unfortunately each of the included object detection example plugins run around 300 lines, but most of those extra lines are boilerplate with my additions being around 100 lines.
+![example-image](https://raw.githubusercontent.com/MegaMosquito/achatina/master/art/example.png)
+
+One of my goals for achatina is to make everything here *easily understandable*. To that end, almost all of the code files in the examples provided here are small and and each directory builds a completely self-contained and composable microservice. As a former teacher of university Computer Science courses for many years, I found that keeping examples small and self-contained enables most people to understand them quickly.
+
+Most of the code is written in Python because this language is both popular and easy to learn. I used Docker for these containers because Docker is by far the easiest OCI container technology I have found. I used Makefiles to capture the commands used to build and run the containers and to highlight the environment variables you can use to configure them. I also wrote a small bash `helper` function to do things like get the local hot's LAN IP address because `make` is not great at doing things like this.
+
+The enclosed documentation gives a high level overview for the architecture, and details the contributions of the individual microservice components. These microservices include the top level program container, `achatina`, 3 different visual inferencing "plugin" containers, and 3 shared services containers that support achatina. Plugins do the interesting work and they can stand alone if desired (i.e., all of the others are optional, depending upon your needs). The Dockerfiles, Makefiles, and source code files here contain important details not in the `README.md` files. Here is a map of the key documents:
+
+├── README.md ................. the document you are reading!
+├── Makefile .................. mostly this Makefile runs make in the subdirs
+├── checks.mk ................. a Makefile fragment to check your env variables
+├── helper .................... the small bash utility I mentioned above
+│
+├── achatina
+│   ├── README.md ............. info for the top level program (needs a plugin)
+│   ├── Makefile .............. builds this container -- lots of docs in here!
+│   ├── Dockerfile.* .......... alpine-based + mqtt, kafka, python requests
+│   └── achatina.py ........... 142 lines (more than half to consume config)
+│
+├── plugins
+│   ├── cpu-only
+│   │   ├── README.md ......... info for the CPU-only plugin (runs everywhere)
+│   │   ├── Makefile .......... just a basic Makefile for the CPU-only plugin
+│   │   ├── Dockerfile.* ...... ubuntu Dockerfiles for cpu plugin (all arches)
+│   │   └── darknet.py ........ my code adds a REST API (at the bottom, ~190loc)
+│   ├── cuda
+│   │   ├── README.md ......... info for CUDA plugin (requires NVIDIA hardware)
+│   │   ├── Makefile .......... just a basic Makefile for the CUDA plugin
+│   │   ├── Dockerfile.* ...... NVIDIA Dockerfiles for amd64 and arm64 only
+│   │   └── darknet.py ........ my code adds ~190 lines for a REST API
+│   └── openvino
+│       ├── README.md ......... info for OpenVino plugin (requires Intel hdwr)
+│       ├── Makefile .......... just a basic Makefile for the OpenVino plugin
+│       ├── Dockerfile.* ...... Intel Dockerfiles for amd64 and arm32 only
+│       └── openvinoyolo.py ... my code adds ~270 lines for a REST API
+│
+└── shared
+    ├── monitor
+    │   ├── Makefile .......... just a basic Makefile for the monitor service
+    │   ├── Dockerfile.* ...... alpine Dockerfiles for the monitor (all arches)
+    │   └── monitor.py ........ 128 line web server (monitors achatina results)
+    ├── mqtt
+    │   ├── Makefile .......... builds an MQTT broker (see inside for test info)
+    │   ├── Dockerfile.* ...... alpine Dockerfiles for MQTT (all arches)
+    │   ├── mosquitto.conf .... basic configuration file for the MQTT broker
+    │   └── mqtt.sh ........... 3 line script to launch MQTT broker with config
+    └── restcam
+        ├── Makefile .......... builds the restcam service -- many docs in here
+        ├── Dockerfile.* ...... ubuntu Dockerfiles for restcam (all arches)
+        ├── cam.sh ............ 35 line (bash) `fswebcam` camera web service
+        └── start.sh .......... 3 line script to launch cam.sh
 
 ## Object Detection and Classification
 
