@@ -11,7 +11,7 @@ JPG="/tmp/cam.jpg"
 RTN_JSON="/tmp/rtn.json"
 SCALE="${CAM_OUT_WIDTH}x${CAM_OUT_HEIGHT}"
 
-@ Use this static image if anything goes wrong
+# Use this static image if anything goes wrong
 MOCK="/mock.jpg"
 
 # Remove any existing image
