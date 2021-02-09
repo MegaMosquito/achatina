@@ -194,7 +194,7 @@ The `image` field contains a [base64](https://linux.die.net/man/1/base64)-encode
 
 ```bash
 mosquitto_sub -h 127.0.0.1 -p 1883 -t /detect | jq '.detect.image=""'
-```.
+```
 
 The `data` field shows the UTC date and time that the image was acquired and inferencing began. The `camtime` field states the time in seconds that was required to acquire the image from the webcam. The `time` field states the time in seconds that the inferencing step took.
 
