@@ -36,8 +36,8 @@ ARCH:=$(shell ../../helper -a)
 # be the standard default Video-4-Linux-v2 (V4L2) camera device address. This
 # default will only be used if CAM_DEVICE is not set in your environment.
 DEFAULT_CAM_DEVICE:="V4L2:/dev/video0"
-# Similarly, this device bind is added to `docker run`:
-DEFAULT_DEVICE_BIND:="--device /dev/video0"
+# Similarly, this device bind is added to `docker run` with `--device`:
+DEFAULT_DEVICE_BIND:="/dev/video0"
 
 # You may also optionally define these variables in your shell environment:
 #     CAM_DELAY_SEC, CAM_OUT_WIDTH, CAM_OUT_HEIGHT
@@ -53,7 +53,7 @@ run: check-dockerhubid
 	docker run -d \
            -p 127.0.0.1:8888:80 \
            --privileged \
-	   $(DEFAULT_DEVICE_BIND) \
+           --device $(DEFAULT_DEVICE_BIND) \
            -e CAM_DEVICE=$(if $(CAM_DEVICE),$(CAM_DEVICE),$(DEFAULT_CAM_DEVICE)) \
            -e CAM_DELAY_SEC="${CAM_DELAY_SEC}" \
            -e CAM_OUT_WIDTH="${CAM_OUT_WIDTH}" \
@@ -69,7 +69,7 @@ dev: check-dockerhubid build
 	docker run -it -v `pwd`:/outside \
            -p 127.0.0.1:8888:80 \
            --privileged \
-	   $(DEFAULT_DEVICE_BIND) \
+           --device $(DEFAULT_DEVICE_BIND) \
            -e CAM_DEVICE=$(if $(CAM_DEVICE),$(CAM_DEVICE),$(DEFAULT_CAM_DEVICE)) \
            -e CAM_DELAY_SEC="${CAM_DELAY_SEC}" \
            -e CAM_OUT_WIDTH="${CAM_OUT_WIDTH}" \
