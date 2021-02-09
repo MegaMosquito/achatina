@@ -17,8 +17,8 @@ RUN apk --no-cache add /kafkacat-*.apk && rm kafkacat-*.apk
 RUN pip3 install requests
 
 # Copy over the source
-COPY app.py /
+COPY achatina.py /
 WORKDIR /
 
 # Run the daemon
-CMD python3 app.py
+CMD python3 achatina.py
