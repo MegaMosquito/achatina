@@ -47,7 +47,7 @@ HOST_IP:=$(shell ../helper -i)
 # in your environment. Note that the "restcam" service normally binds to
 # this port and it can simulate a camera if no camera is available
 # (i.e., it will return static images if access to a local camera fails).
-DEFAULT_INPUT_URL:="http://localhost:8888/"
+DEFAULT_INPUT_URL:="http://${HOST_IP}:8888/"
 
 build: check-dockerhubid
 	docker build -t $(DOCKERHUB_ID)/$(SERVICE_NAME)_$(ARCH):$(SERVICE_VERSION) -f ./Dockerfile.$(ARCH) .
