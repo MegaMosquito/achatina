@@ -32,8 +32,8 @@
 #
 
 # These statements will automatically configure some environment variables
-ARCH:=$(shell ../../helper -a)
-NODE:=$(shell ../../helper -n)
+ARCH:=$(shell ./helper -a)
+NODE:=$(shell ./helper -n)
 
 run: run-cpu-only
 build: build-cpu-only
