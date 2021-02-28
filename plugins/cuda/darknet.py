@@ -246,7 +246,7 @@ if __name__ == "__main__":
   #  x indicates a currently ignored parameter
   #
   # Usage example:
-  #   curl http://localhost:5252/detect?kind=json&url=http%3A%2F%2Frestcam
+  #   curl "http://localhost:5252/detect?kind=json&url=http%3A%2F%2Frestcam"
   #
   @webapp.route("/detect", methods=['GET'])
   def get_detect():
