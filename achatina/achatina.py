@@ -28,7 +28,7 @@ def get_from_env(v, d):
   else:
     return d
 ACHATINA_PLUGIN = get_from_env('ACHATINA_PLUGIN', 'cpu-only')
-MQTT_BROKER_ADDRESS = get_from_env('MQTT_BROKER_ADDRESS', 'mqtt')
+MQTT_BROKER_URL = get_from_env('MQTT_BROKER_URL', 'mqtt')
 MQTT_BROKER_PORT = get_from_env('MQTT_BROKER_PORT', '1883')
 MQTT_PUB_TOPIC = get_from_env('MQTT_PUB_TOPIC', '/detect')
 KAFKA_BROKER_URLS = get_from_env('KAFKA_BROKER_URLS', '')
@@ -45,7 +45,7 @@ if '' == INPUT_URL:
 
 # Log some useful information
 print('achatina: ACHATINA_PLUGIN="%s"' % ACHATINA_PLUGIN)
-print('achatina: MQTT_BROKER_ADDRESS="%s"' % MQTT_BROKER_ADDRESS)
+print('achatina: MQTT_BROKER_URL="%s"' % MQTT_BROKER_URL)
 print('achatina: MQTT_BROKER_PORT="%s"' % MQTT_BROKER_PORT)
 print('achatina: MQTT_PUB_TOPIC="%s"' % MQTT_PUB_TOPIC)
 print('achatina: KAFKA_BROKER_URLS="%s"' % KAFKA_BROKER_URLS)
@@ -64,7 +64,7 @@ if 'ACHATINA_PLUGIN' in os.environ and 'openvino' == os.environ['ACHATINA_PLUGIN
 else:
   PLUGIN_URL = ('http://%s:80/detect?url=%s' % (ACHATINA_PLUGIN, urllib.parse.quote(INPUT_URL)))
 TEMP_FILE = '/tmp/achatina.json'
-MQTT_PUB_COMMAND = ('mosquitto_pub -h %s -p %s -t %s -f ' % (MQTT_BROKER_ADDRESS, MQTT_BROKER_PORT, MQTT_PUB_TOPIC))
+MQTT_PUB_COMMAND = ('mosquitto_pub -h %s -p %s -t %s -f ' % (MQTT_BROKER_URL, MQTT_BROKER_PORT, MQTT_PUB_TOPIC))
 if '' != KAFKA_BROKER_URLS and '' != KAFKA_API_KEY and '' != KAFKA_PUB_TOPIC:
   KAFKA_PUB_COMMAND = 'kafkacat -P -b ' + KAFKA_BROKER_URLS + ' -X api.version.request=true -X security.protocol=sasl_ssl -X sasl.mechanisms=PLAIN -X sasl.username=token -X sasl.password="' + KAFKA_API_KEY + '" -t ' + KAFKA_PUB_TOPIC + ' '
 else:
