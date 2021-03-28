@@ -1,0 +1,12 @@
+FROM nvcr.io/nvidia/l4t-base:r32.3.1
+
+RUN apt update
+RUN apt install -y python3-pip
+RUN pip3 install Flask
+
+RUN mkdir -p /tmp/working
+WORKDIR /tmp/working
+COPY nvcsirestcam.py /tmp/working
+
+CMD python3 nvcsirestcam.py
+
