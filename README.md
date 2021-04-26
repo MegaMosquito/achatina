@@ -70,7 +70,7 @@ These YOLO examples are easy to work with, and they run on small computers, so t
 
 All of the examples here *require a recent version of Docker* to be installed (I think version 18.06 or newer will work, maybe older ones too).
 
-Using docker makes these examples extremely portable, requiring little or no setup on any host to use these examples. Usually all prerequistes are embedded within the resulting Docker containers. I try to do almost all of my coding within Docker containers these days, and acahtina is no exception.
+Using docker makes these examples extremely portable, requiring little or no setup on any host to use these examples. Usually all prerequisites are embedded within the resulting Docker containers. I try to do almost all of my coding within Docker containers these days, and achatina is no exception.
 
 ## Usage
 
@@ -80,7 +80,7 @@ To quickly try this on your Linux machine:
 - (optionally) attach a camera device (usually on `/dev/video0`, and compatible with `fswebcam`)
 - clone this git repo, then cd into the top directory
 - put your dockerhub.com ID into the DOCKERHUB_ID enviropnment variable, e.g.: `export DOCKERHUB_ID=ibmosquito` (or set it to your favorite color... doesn't really matter what it is set to)
-- run `make run` (or some other target) -- the `run` target will build and then run the CPU-only example (so it shgould work on almost any device, ARM32v6 and up, ARM64, and x86)
+- run `make run` (or some other target) -- the `run` target will build and then run the CPU-only example (so it should work on almost any device, ARM32v6 and up, ARM64, and x86)
 - when everything finishes building and comes up, point your browser to port `5200` on this host machine, i.e., go to: `http://ipaddress:5200/` (e.g., `http://localhost:5200/` if you are running the browser on the same machine).
 
 For more info, read the `README.md` files (here at the top, and in each of the `plugin` subdirectories). Also read the Makefiles in each of these directories to see how the Docker containers are started, and the environment variables you can use to configure them differently (e.g., for a local camera on a different path than `/dev/video0`, or for any compatible remote webcam service).
@@ -121,11 +121,11 @@ The [CPU-only](https://github.com/MegaMosquito/achatina/tree/master/plugins/cpu-
 
 Using an NVIDIA GPU (or other GPU or specialized visual inferencing hardware, like an Intel VPU) to accelerate inferencing will usually significantly improve achatina's speed. Accelerated examples available currently include:
 
-1. CUDA Example
+#### 1. CUDA Example
 
 The CUDA example is GPU-accelerated. The [CUDA](https://github.com/MegaMosquito/achatina/tree/master/plugins/cuda) plugin relies on the NVIDIA CUDA software which requires an NVIDIA GPU. The CUDA plugin should work with any NVIDIA GPU, and has been tested on GTX GPUs, Testla T4, and Jetson TX1, TX2, Nano 4GB, Nano 2GB, and Xavier NX.
 
-2. OpenVino Example
+#### 2. OpenVino Example
 
 The OpenVino example is VPU-accelerated. The [OpenVino](https://github.com/MegaMosquito/achatina/tree/master/plugins/openvino) plugin relies on the Intel OpenVino software which requires an Intel VPU. The OpenVino plugin should work with any Intell Movidius VPU, and it has been tested on a 2-VPU Movidius Myriad card and the Movidius Neural Compute stick 2.
 
@@ -188,15 +188,15 @@ The detector is expected to deliver a JSON payload back to the app. That JSON is
 }
 ```
 
-Fields like `source`, `source-url`, and `tool` provide information about this particular detector plugin. The device sending the data is identified with `device-id`.
+Fields like `source`, `source-url`, and `tool` provide information about this particular detector plugin. The device sending the data is identified with `deviceid`.
 
-The `image` field contains a [base64](https://linux.die.net/man/1/base64)-encoded post-inferencing image. In the image, all detected entities are highlighted with bounding boxes that have a label across the top stating the entity class, the and the classification confidence. This field iis typically very large so it makes watching the raw MQTT output a bit challenging. Try this too watch the `/detect` topic but suppress the huge base64 image encoding:
+The `image` field contains a [base64](https://linux.die.net/man/1/base64)-encoded post-inferencing image. In the image, all detected entities are highlighted with bounding boxes that have a label across the top stating the entity class and the classification confidence. This field is typically very large so it makes watching the raw MQTT output a bit challenging. Try this to watch the `/detect` topic but suppress the huge base64 image encoding:
 
 ```bash
 mosquitto_sub -h 127.0.0.1 -p 1883 -t /detect | jq '.detect.image=""'
 ```
 
-The `data` field shows the UTC date and time that the image was acquired and inferencing began. The `camtime` field states the time in seconds that was required to acquire the image from the webcam. The `time` field states the time in seconds that the inferencing step took.
+The `date` field shows the UTC date and time that the image was acquired and inferencing began. The `camtime` field states the time in seconds that was required to acquire the image from the webcam. The `time` field states the time in seconds that the inferencing step took.
 
 There may be zero or more entities of zero or more classes detected (YOLO/COCO only knows 80 classes). The detected `entities` are organized by class. The details array for each detected class contains entries showing for each detected entity the classification confidence (between 0.0 and 1.0), the center location (cx, cy) and the bounding box size (w, h) surrounding the entity.
 
@@ -204,7 +204,7 @@ If kafka credentials were provided, then the `kafkacat` command to subscribe is 
 
 ## For more info
 
-Each of the plugin examples has its own README.md with additional details.
+Each of the plugin examples has its own `README.md` with additional details.
 
 ## Author
 
