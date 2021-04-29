@@ -42,12 +42,28 @@ ARCH:=$(shell ../helper -a)
 NODE:=$(shell ../helper -n)
 HOST_IP:=$(shell ../helper -i)
 
-# This configues the default input to be a camera servce running on the
-# host at port 8888. This default will not be used if you set INPUT_URL
-# in your environment. Note that the "restcam" service normally binds to
-# this port and it can simulate a camera if no camera is available
-# (i.e., it will return static images if access to a local camera fails).
-DEFAULT_INPUT_URL:="http://${HOST_IP}:8888/"
+# ***************************************************************************
+#          IMPORTANT NOTEs REGARDING THE SHARED CAMERA SERVICES
+# ***************************************************************************
+# The shared camera services are optional. You can use any camera that can
+# be exposed an HTTP image URL. The shared services, "restcam" for any
+# Video for Linux v2 (V4L2) cameras, and "nvcsirestcam" for NVIDIA Jetson
+# "CSI" (thin ribbon cable) cameras, are provided as a convenience. Feel
+# free to use any other HTTP image URL and omit these containers
+# The URL below sets the default input to be the restcam service, which binds
+# by default binds itself to port 80 on docker bridge network "cam-net" with
+# network alias "restcam". It also binds to the host loopback address at
+# port 8888. One might think that one could use "http://localhost:8888" as
+# the camera URL here in that case, but this would *not* work within any
+# container because each container has its own loopback (distinct from the
+# host loopback)! You can safely use "http://localhost:8888" in a host shell
+# but to use the restcam service within a container you need to first attach
+# the container to "cam-net" and then use “http://restcam:80/”. This is what
+# the plug-in container do. This "achatina" container doe not do that because
+# it never directly connects to the camera. Instead, it passed this URL to
+# the plugin and the plugin connects to the camera. This is complex to
+# understand but I think it is the best design for this plugin architecture.
+DEFAULT_INPUT_URL:=“http://restcam:80/”
 
 build: check-dockerhubid
 	docker build -t $(DOCKERHUB_ID)/$(SERVICE_NAME)_$(ARCH):$(SERVICE_VERSION) -f ./Dockerfile.$(ARCH) .
