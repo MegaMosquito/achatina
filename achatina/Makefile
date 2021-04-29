@@ -63,7 +63,7 @@ HOST_IP:=$(shell ../helper -i)
 # it never directly connects to the camera. Instead, it passed this URL to
 # the plugin and the plugin connects to the camera. This is complex to
 # understand but I think it is the best design for this plugin architecture.
-DEFAULT_INPUT_URL:=“http://restcam:80/”
+DEFAULT_INPUT_URL:=http://restcam:80/
 
 build: check-dockerhubid
 	docker build -t $(DOCKERHUB_ID)/$(SERVICE_NAME)_$(ARCH):$(SERVICE_VERSION) -f ./Dockerfile.$(ARCH) .
