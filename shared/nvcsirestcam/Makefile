@@ -23,7 +23,7 @@
 include ../../checks.mk
 
 # Using the same name for this service as the `fswebcam`-based version so it
-# can be used as a direct drop-in replacement for that servcie on Jetsons.
+# can be used as a direct drop-in replacement for that service on Jetsons.
 SERVICE_NAME:="restcam"
 SERVICE_VERSION:="1.0.0"
 
