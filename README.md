@@ -40,20 +40,20 @@ The enclosed documentation gives a high level overview for the architecture, and
 │       └── openvinoyolo.py ... my code adds ~270 lines for a REST API
 │
 └── shared
-    ├── monitor
+    ├── monitor
     │   ├── Makefile .......... just a basic Makefile for the monitor service
     │   ├── Dockerfile.* ...... alpine Dockerfiles for the monitor (all arches)
-    │   └── monitor.py ........ 128 line web server (monitors achatina results)
-    ├── mqtt
+    │   └── monitor.py ........ 128 line web server (monitors achatina results)
+    ├── mqtt
     │   ├── Makefile .......... builds an MQTT broker (see inside for test info)
     │   ├── Dockerfile.* ...... alpine Dockerfiles for MQTT (all arches)
     │   ├── mosquitto.conf .... basic configuration file for the MQTT broker
-    │   └── mqtt.sh ........... 3 line script to launch MQTT broker with config
-    └── restcam
+    │   └── mqtt.sh ........... 3 line script to launch MQTT broker with config
+    └── restcam
         ├── Makefile .......... builds the restcam service -- many docs in here
         ├── Dockerfile.* ...... ubuntu Dockerfiles for restcam (all arches)
-        ├── cam.sh ............ 35 line (bash) `fswebcam` camera web service
-        └── start.sh .......... 3 line script to launch cam.sh
+        ├── cam.sh ............ 35 line (bash) `fswebcam` camera web service
+        └── start.sh .......... 3 line script to launch cam.sh
 ```
 
 ## Object Detection and Classification
