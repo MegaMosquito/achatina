@@ -34,7 +34,7 @@ The enclosed documentation gives a high level overview for the architecture, and
 │   │   ├── Dockerfile.* ...... NVIDIA Dockerfiles for amd64 and arm64 only
 │   │   └── darknet.py ........ my code adds ~190 lines for a REST API
 │   └── openvino
-│       ├── README.md ......... info for OpenVino plugin (requires Intel hdwr)
+│       ├── README.md ......... info for OpenVino plugin (requires Intel hardware)
 │       ├── Makefile .......... just a basic Makefile for the OpenVino plugin
 │       ├── Dockerfile.* ...... Intel Dockerfiles for amd64 and arm32 only
 │       └── openvinoyolo.py ... my code adds ~270 lines for a REST API
@@ -79,7 +79,7 @@ To quickly try this on your Linux machine:
 - make sure docker, git and make are installed
 - (optionally) attach a camera device (usually on `/dev/video0`, and compatible with `fswebcam`)
 - clone this git repo, then cd into the top directory
-- put your dockerhub.com ID into the DOCKERHUB_ID enviropnment variable, e.g.: `export DOCKERHUB_ID=ibmosquito` (or set it to your favorite color... doesn't really matter what it is set to)
+- put your dockerhub.com ID into the DOCKERHUB_ID environment variable, e.g.: `export DOCKERHUB_ID=ibmosquito` (or set it to your favorite color... doesn't really matter what it is set to)
 - run `make run` (or some other target) -- the `run` target will build and then run the CPU-only example (so it should work on almost any device, ARM32v6 and up, ARM64, and x86)
 - when everything finishes building and comes up, point your browser to port `5200` on this host machine, i.e., go to: `http://ipaddress:5200/` (e.g., `http://localhost:5200/` if you are running the browser on the same machine).
 
@@ -115,7 +115,7 @@ This repository contains the following example `plugins`:
 
 ### CPU-Only Example
 
-The [CPU-only](https://github.com/MegaMosquito/achatina/tree/master/plugins/cpu-only) plugin works on arm32, arm64, and amd64 hardware using only the CPU(s) of the machine. CPUs are not very fast for visual inferencing, but if that's all you've got you can still do cool stuff with them. And hey, if it takes 60 seconds to detect something in an image, maybe that is more than fine for your particular application. If so, you can save some of your cash, because the accelerated examples usually have significant additional costs. Achatina may be slow, but she's happy with just a CPU to work with. She doesn't need any fancy inferencing accelerators to get the job done.
+The [CPU-only](https://github.com/MegaMosquito/achatina/tree/master/plugins/cpu-only) plugin works on arm32, arm64, and amd64 hardware using only the CPU(s) of the machine. CPUs are not very fast for visual inferencing, but if that's all you've got, you can still do cool stuff with them. And hey, if it takes 60 seconds to detect something in an image, maybe that is more than fine for your particular application. If so, you can save some of your cash, because the accelerated examples usually have significant additional costs. Achatina may be slow, but she's happy with just a CPU to work with. She doesn't need any fancy inferencing accelerators to get the job done.
 
 ### Accelerated Examples
 
