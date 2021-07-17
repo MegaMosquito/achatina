@@ -93,7 +93,13 @@ Many of the examples use the following 3 shared service containers:
 
 (Optional. Not needed if you want to use some other camera service)
 
-All of these examples are also designed to make use of a camera, or a webcam. By default they try to use the local [restcam](https://github.com/MegaMosquito/achatina/tree/master/shared/restcam) shared service and it, in turn, uses the popular [fswebcam](https://github.com/fsphil/fswebcam) software to view the world through your camera. If image retrieval fails (e.g., if you don't have a camera attached) the raw original of the image above (before inferencing, and without any bounding boxes, labels, etc.) will be provided by the `restcam` service. The `restcam` service provides images in the form of an image file, suitable for embedding in an HTML document. So you can easilt replace the `restcam` service with another image source anywhere on your LAN or even out on the Internet.
+All of these examples are also designed to make use of a camera, or a webcam. By default they try to use the local [restcam](https://github.com/MegaMosquito/achatina/tree/master/shared/restcam) shared service and it, in turn, uses the popular [fswebcam](https://github.com/fsphil/fswebcam) software to view the world through your camera. If image retrieval fails (e.g., if you don't have a camera attached) the raw original of the image above (before inferencing, and without any bounding boxes, labels, etc.) will be provided by the `restcam` service. The `restcam` service provides images in the form of an image file, suitable for embedding in an HTML document. So you can easily replace the `restcam` service with another image source anywhere on your LAN or even out on the Internet.
+
+### Shared Service -- nvcsirestcam
+
+(Optional. Not needed if you want to use some other camera service)
+
+All of these examples are also designed to make use of a camera, or a webcam. For NVIDIA Jetson machines with MIPI CSI cameras, we can use [nvcsirestcam](https://github.com/MegaMosquito/achatina/tree/master/shared/nvcsirestcam) shared service. Similar to `restcam`, the `nvcsirestcam` service provides images in the form of an image file, suitable for embedding in an HTML document. So you can easily replace the `nvcsirestcam` service with another image source anywhere on your LAN or even out on the Internet.
 
 ### Shared Service -- mqtt
 
@@ -123,21 +129,21 @@ Using an NVIDIA GPU (or other GPU or specialized visual inferencing hardware, li
 
 #### 1. CUDA Example
 
-The CUDA example is GPU-accelerated. The [CUDA](https://github.com/MegaMosquito/achatina/tree/master/plugins/cuda) plugin relies on the NVIDIA CUDA software which requires an NVIDIA GPU. The CUDA plugin should work with any NVIDIA GPU, and has been tested on GTX GPUs, Testla T4, and Jetson TX1, TX2, Nano 4GB, Nano 2GB, and Xavier NX.
+The CUDA example is GPU-accelerated. The [CUDA](https://github.com/MegaMosquito/achatina/tree/master/plugins/cuda) plugin relies on the NVIDIA CUDA software which requires an NVIDIA GPU. The CUDA plugin should work with any NVIDIA GPU, and has been tested on GTX GPUs, Tesla T4, and Jetson TX1, TX2, Nano 4GB, Nano 2GB, and Xavier NX.
 
 #### 2. OpenVino Example
 
-The OpenVino example is VPU-accelerated. The [OpenVino](https://github.com/MegaMosquito/achatina/tree/master/plugins/openvino) plugin relies on the Intel OpenVino software which requires an Intel VPU. The OpenVino plugin should work with any Intell Movidius VPU, and it has been tested on a 2-VPU Movidius Myriad card and the Movidius Neural Compute stick 2.
+The OpenVino example is VPU-accelerated. The [OpenVino](https://github.com/MegaMosquito/achatina/tree/master/plugins/openvino) plugin relies on the Intel OpenVino software which requires an Intel VPU. The OpenVino plugin should work with any Intel Movidius VPU, and it has been tested on a 2-VPU Movidius Myriad card and the Movidius Neural Compute stick 2.
 
 ## How Does This Work?
 
-Each of these examples consists of multiple Docker containers providing services to each other privately and exposing some services on the host. Each of them also is designed to optionally push its results to a local or remote MQTT broker and/or a remote [Apache Kafka](https://kafka.apache.org/) end point (broker). If you provide Kafka credentials, for a broker you have configured, then you can subscribe to that Kafka broker from other machines and monitor the output remotely.
+Each of these examples consists of multiple Docker containers providing services to each other privately and exposing some services on the host. Each of them also is designed to optionally push its results to a local or remote MQTT broker and/or a remote [Apache Kafka](https://kafka.apache.org/) endpoint (broker). If you provide Kafka credentials for a broker you have configured, then you can subscribe to that Kafka broker from other machines and monitor the output remotely.
 
 ### Service Architecture
 
 The examples here are structured with 5 "microservices":
 
-1. `restcam` -- a webcam service (you can optionally use any other web cam service and not include this `restcam` service at all of you wish)
+1. `restcam` -- a webcam service (you can optionally use `nvcsirestcam` or any other web cam service and not include this `restcam` service at all if you wish)
 2. `mqtt` -- a locally accessible MQTT broker (intended for development and debugging; it can optionally be removed)
 3. `monitor` -- a tiny web server, implemented with Python Flask for monitoring the example's output (intended for development and debugging, it can optionally be removed)
 4. an *object detector* "plugin" service -- an object detection and classification REST service. Example plugins are provided in the ["plugins" subdirectory](https://github.com/MegaMosquito/achatina/tree/master/plugins).
@@ -147,7 +153,7 @@ The diagram below shows the common architecture used for these examples:
 
 ![architecture-diagram](https://raw.githubusercontent.com/MegaMosquito/achatina/master/art/arch.png)
 
-Arrows in the diagram represent the flow of data. Squares represent software components. Start at the `app`, invoke a REST GET on the plugin `detector` service, passing the image source URL. The `detector` then invokes a REST GET on that image source URL (either the default `restcam` service or some other source), runs its inferencing magic upon it, then it responds to the REST GET from the `app` with the results, encoded in JSON (the image, and metadata about what was detected). Normally the `app` then publishes to `mqtt` (optional) and the remote Kafka broker (if credentials were provided). The `monitor` is watching `mqtt` and provides a local web server on port `5200` where you can see the results.
+Arrows in the diagram represent the flow of data. Squares represent software components. The achatina `app` starts by invoking a REST GET on the plugin `detector` service, passing the image source URL. The `detector` then invokes a REST GET on that image source URL (either the default `restcam`, `nvcsirestcam` service, or some other source), runs its inferencing magic upon it, then it responds to the REST GET from the `app` with the results, encoded in JSON (the image, and metadata about what was detected). Normally the `app` then publishes to `mqtt` (optional) and the remote Kafka broker (if credentials were provided). The `monitor` is watching `mqtt` and provides a local web server on port `5200` where you can see the results.
 
 This architecture enables the visual inferencing engine to remain "hot" awaiting new images. That is, at initial warm-up, the neural network is configured and the model weights are loaded, and they remain loaded ("hot") forever after that. They do not need to be reloaded each time inferencing is performed. This is important because neural network models tend to be large, so loading the edge weights is a time-consuming process. If you load them for each individual inferencing task, performance would be much slower. Although achatina may be slow, she does avoid this particular performance degradation altogether.
 
