@@ -1,19 +1,24 @@
+FROM alpine:latest as kafka_build
+
+RUN apk update && apk add --no-cache \
+  curl \
+  git \
+  build-base \
+  bash \
+  coreutils
+
+# Build and install kafka tools
+RUN git clone -b 1.4.0 --single-branch https://github.com/edenhill/kafkacat.git && cd kafkacat && bash ./bootstrap.sh && make install && strip /usr/local/bin/kafkacat
+
 FROM python:3.7-alpine
 
 RUN apk update && apk add --no-cache \
-  bash \
-  alpine-sdk \
-  cmake \
-  curl-dev \
-  bsd-compat-headers \
-  perl \
   mosquitto-clients \
   jq \
   && rm -fr /tmp/*
 
-# Build and install kafka tools (should really use a 2-stage docker build here)
-RUN curl https://codeload.github.com/edenhill/kafkacat/tar.gz/master | tar xzf - && cd kafkacat-* && bash ./bootstrap.sh
-RUN make -C /kafkacat-master bin-install
+# Copy over the kafka installation
+COPY --from=kafka_build /usr/local/bin/kafkacat /usr/local/bin/kafkacat
 
 # Install requests (REST API client)
 RUN pip install requests
