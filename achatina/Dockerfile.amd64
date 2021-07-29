@@ -1,26 +1,37 @@
-FROM python:3.7-alpine
+FROM alpine:latest as base
 
-RUN apk update && apk add --no-cache \
+RUN apk update
+
+FROM base as kafka_build
+
+RUN apk add --no-cache \
+  curl \
+  git \
+  build-base \
   bash \
-  alpine-sdk \
-  cmake \
-  curl-dev \
-  bsd-compat-headers \
-  perl \
+  coreutils
+
+# Build and install kafka tools
+RUN git clone -b 1.4.0 --single-branch https://github.com/edenhill/kafkacat.git && cd kafkacat && bash ./bootstrap.sh && make install && strip /usr/local/bin/kafkacat
+
+FROM base
+
+RUN apk add --no-cache \
+  python3 \
+  py3-pip \
   mosquitto-clients \
   jq \
   && rm -fr /tmp/*
 
-# Build and install kafka tools (should really use a 2-stage docker build here)
-RUN curl https://codeload.github.com/edenhill/kafkacat/tar.gz/master | tar xzf - && cd kafkacat-* && bash ./bootstrap.sh
-RUN make -C /kafkacat-master bin-install
+# Copy over the kafka installation
+COPY --from=kafka_build /usr/local/bin/kafkacat /usr/local/bin/kafkacat
 
 # Install requests (REST API client)
-RUN pip install requests
+RUN pip3 install requests
 
 # Copy over the source
 COPY achatina.py /
 WORKDIR /
 
 # Run the daemon
-CMD python achatina.py
+CMD python3 achatina.py
