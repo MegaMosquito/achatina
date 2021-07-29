@@ -4,7 +4,6 @@ RUN apk update && apk add --no-cache \
   bash \
   mosquitto-clients \
   python3 \
-  curl \
   jq \
   && rm -fr /tmp/*
 
