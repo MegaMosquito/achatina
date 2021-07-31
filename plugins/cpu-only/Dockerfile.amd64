@@ -19,7 +19,6 @@ RUN wget -O yolo-tiny.cfg https://raw.githubusercontent.com/pjreddie/darknet/mas
 RUN wget -O yolo-tiny.weights https://pjreddie.com/media/files/yolov2-tiny.weights
 
 # Copy over the logo(s)
-COPY o-h.png /
 COPY logo.png /
 
 # Copy over the darknet and webserver code
