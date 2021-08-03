@@ -19,7 +19,6 @@ RUN pip install wheel
 RUN pip install flask requests pillow
 
 # Copy over the logo(s)
-COPY o-h.png /
 COPY logo.png /
 
 # Copy over the code
