@@ -217,6 +217,8 @@ Each of the plugin examples has its own `README.md` with additional details.
 Written by Glen Darling <mosquito@darlingevil.com>, March 2020.
 V2 written by Glen Darling <mosquito@darlingevil.com>, October 2020.
 
+Numerous additional contributions by Clement Ng <clementdng@gmail.com>.
+
 Inspired by earlier related work from my former teammate, [David Martin](https://github.com/dcmartin).
 
 
