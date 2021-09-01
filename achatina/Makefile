@@ -1,7 +1,7 @@
 #
 # Achatina V2
 #
-# This container uses an image source URL (empty, HTTP Image, or RTSP stream).
+# This container uses an image source URL (empty or HTTP Image).
 # It sends that URL to a visual inferencing plugin (cpu-only, cuda, openvino),
 # then it normally publishes the results to an MQTT broker. If appropriately
 # configured, it can also publish the results to a remote Kafka broker.
@@ -30,12 +30,10 @@ SERVICE_VERSION:="2.0.0"
 # Note that KAFKA_BROKER_URLS is a string containing a comma-separated list
 # of broker URLs in your Kafka broker pool.
 
-# Optionally configure an INPUT_URL in your environment. You have 3 choices:
+# Optionally configure an INPUT_URL in your environment. You have 2 choices:
 #   1. Don't set it and the restcam service or a static image will be used
 #   2. Provide a valid HTTP image URL. E.g.:
 #          https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Einstein_1921_by_F_Schmutzer_-_restoration.jpg/780px-Einstein_1921_by_F_Schmutzer_-_restoration.jpg
-#   3. Provide a valid RTSP stream URL. E.g.:
-#           rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov
 
 # These statements automatically configure some environment variables
 ARCH:=$(shell ../helper -a)

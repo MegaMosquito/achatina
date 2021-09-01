@@ -15,12 +15,10 @@
 #   clean           (stop and remove all example containers, and their images)
 #   deep-clean      (cleanup docker, incl. all contaiiners, images, networks)
 #
-# Optionally configure an INPUT_URL in your environment. You have 3 choices:
+# Optionally configure an INPUT_URL in your environment. You have 2 choices:
 #   1. Don't set it and the "restcam" service or a static image will be used
 #   2. Provide a valid HTTP image URL. E.g.:
 #          https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Einstein_1921_by_F_Schmutzer_-_restoration.jpg/780px-Einstein_1921_by_F_Schmutzer_-_restoration.jpg
-#   3. Provide a valid RTSP stream URL. E.g.:
-#           rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov
 #
 # If you wish to use the "restcam" (see shared/restcam) there are additional
 # enviropnment variables you may wish to set to configure that servcie.
