@@ -59,7 +59,6 @@ RUN python3.7 -m pip install --no-cache-dir \
 WORKDIR /
 COPY openvinoyolo.py /
 COPY logo.png /
-COPY mock.jpg /
 RUN wget -O openvino-yolo-v3.zip https://ibm.box.com/shared/static/spvtnk8f344jhgw07me3vdlsjkdbax05.zip && unzip -j openvino-yolo-v3.zip
 
 CMD [ "/bin/bash", "-c", "source /opt/intel/openvino/bin/setupvars.sh ; /usr/bin/python3 /openvinoyolo.py /openvino-yolo-v3.xml /openvino-yolo-v3.bin /openvino-yolo-v3.labels" ]
