@@ -8,7 +8,6 @@ if [ -z "${CAM_OUT_HEIGHT:-}" ]; then CAM_OUT_HEIGHT=480; fi
 
 # Files (@@@ these should all be just in RAM)
 JPG="/tmp/cam.jpg"
-RTN_JSON="/tmp/rtn.json"
 SCALE="${CAM_OUT_WIDTH}x${CAM_OUT_HEIGHT}"
 
 # Use this static image if anything goes wrong
