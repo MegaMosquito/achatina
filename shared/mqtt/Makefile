@@ -42,6 +42,8 @@ run: check-dockerhubid
            --network mqtt-net --network-alias $(SERVICE_NAME) \
            $(DOCKERHUB_ID)/$(SERVICE_NAME)_$(ARCH):$(SERVICE_VERSION)
 
+dev: run
+
 
 # =============================================================================
 # To perform a quick self-test of the "mqtt" service:
