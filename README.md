@@ -8,7 +8,7 @@ One of my goals for achatina is to make everything here *easily understandable*.
 
 Most of the code is written in Python because this language is both popular and easy to learn. I used Docker for these containers because Docker is by far the easiest OCI container technology I have found. I used Makefiles to capture the commands used to build and run the containers and to highlight the environment variables you can use to configure them. I also wrote a small bash `helper` function to do things like get the local hot's LAN IP address because `make` is not great at doing things like this.
 
-The enclosed documentation gives a high level overview for the architecture, and details the contributions of the individual microservice components. These microservices include the top level program container, `achatina`, 3 different visual inferencing "plugin" containers, and 3 shared services containers that support achatina. Plugins do the interesting work and they can stand alone if desired (i.e., all of the others are optional, depending upon your needs). The Dockerfiles, Makefiles, and source code files here contain important details not in the `README.md` files. Here is a map of the key documents:
+The enclosed documentation gives a high level overview for the architecture, and details the contributions of the individual microservice components. These microservices include the top level program container, `achatina`, 3 different visual inferencing "plugin" containers, and 3 shared services containers that support achatina. Plugins do the interesting work and they can stand alone if desired (i.e., all of the others are optional, depending upon your needs). The Dockerfiles, Makefiles, and source code files here contain important details not in this `README.md`. Here is a map of the key documents:
 
 ```
 ├── README.md ................. the document you are reading!
@@ -24,17 +24,14 @@ The enclosed documentation gives a high level overview for the architecture, and
 │
 ├── plugins
 │   ├── cpu-only
-│   │   ├── README.md ......... info for the CPU-only plugin (runs everywhere)
 │   │   ├── Makefile .......... just a basic Makefile for the CPU-only plugin
 │   │   ├── Dockerfile.* ...... ubuntu Dockerfiles for cpu plugin (all arches)
 │   │   └── darknet.py ........ my code adds a REST API (at the bottom, ~190loc)
 │   ├── cuda
-│   │   ├── README.md ......... info for CUDA plugin (requires NVIDIA hardware)
 │   │   ├── Makefile .......... just a basic Makefile for the CUDA plugin
 │   │   ├── Dockerfile.* ...... NVIDIA Dockerfiles for amd64 and arm64 only
 │   │   └── darknet.py ........ my code adds ~190 lines for a REST API
 │   └── openvino
-│       ├── README.md ......... info for OpenVino plugin (requires Intel hardware)
 │       ├── Makefile .......... just a basic Makefile for the OpenVino plugin
 │       ├── Dockerfile.* ...... Intel Dockerfiles for amd64 and arm32 only
 │       └── openvinoyolo.py ... my code adds ~270 lines for a REST API
@@ -83,7 +80,7 @@ To quickly try this on your Linux machine:
 - run `make run` (or some other target) -- the `run` target will build and then run the CPU-only example (so it should work on almost any device, ARM32v6 and up, ARM64, and x86)
 - when everything finishes building and comes up, point your browser to port `5200` on this host machine, i.e., go to: `http://ipaddress:5200/` (e.g., `http://localhost:5200/` if you are running the browser on the same machine).
 
-For more info, read the `README.md` files (here at the top, and in each of the `plugin` subdirectories). Also read the Makefiles in each of these directories to see how the Docker containers are started, and the environment variables you can use to configure them differently (e.g., for a local camera on a different path than `/dev/video0`, or for any compatible remote webcam service).
+For more info, read the Makefiles in each of these directories to see how the Docker containers are started, and the environment variables you can use to configure them differently (e.g., for a local camera on a different path than `/dev/video0`, or for any compatible remote webcam service).
 
 ## More Details
 
@@ -207,10 +204,6 @@ The `date` field shows the UTC date and time that the image was acquired and inf
 There may be zero or more entities of zero or more classes detected (YOLO/COCO only knows 80 classes). The detected `entities` are organized by class. The details array for each detected class contains entries showing for each detected entity the classification confidence (between 0.0 and 1.0), the center location (cx, cy) and the bounding box size (w, h) surrounding the entity.
 
 If kafka credentials were provided, then the `kafkacat` command to subscribe is provided when publishing to MQTT. This is redundant in the kafka data so it is omitted when sending the JSON to kafka.
-
-## For more info
-
-Each of the plugin examples has its own `README.md` with additional details.
 
 ## Author
 
