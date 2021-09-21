@@ -49,6 +49,10 @@ The enclosed documentation gives a high level overview for the architecture, and
     │   ├── Dockerfile.* ...... alpine Dockerfiles for MQTT (all arches)
     │   ├── mosquitto.conf .... basic configuration file for the MQTT broker
     │   └── mqtt.sh ........... 3 line script to launch MQTT broker with config
+    ├── nvcsirestcam
+    │   ├── Makefile .......... builds the nvcsirestcam service -- many docs in here
+    │   ├── Dockerfile.* ...... ubuntu Dockerfiles for nvcsirestcam (arm64 only)
+    │   └── nvcsirestcam.py ... 160 line NVIDIA Jetson MIPI CSI camera web service
     └── restcam
         ├── Makefile .......... builds the restcam service -- many docs in here
         ├── Dockerfile.* ...... ubuntu Dockerfiles for restcam (all arches)
