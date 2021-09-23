@@ -60,6 +60,7 @@ run: check-dockerhubid
            -e CAM_OUT_HEIGHT="${CAM_OUT_HEIGHT}" \
            --name ${SERVICE_NAME} \
            --network cam-net --network-alias $(SERVICE_NAME) \
+           --mount type=tmpfs,destination=/app \
            $(DOCKERHUB_ID)/$(SERVICE_NAME)_$(ARCH):$(SERVICE_VERSION)
 
 # This target mounts this code dir in the container, useful for development.
@@ -76,6 +77,7 @@ dev: check-dockerhubid build
            -e CAM_OUT_HEIGHT="${CAM_OUT_HEIGHT}" \
            --name ${SERVICE_NAME} \
            --network cam-net --network-alias $(SERVICE_NAME) \
+           --mount type=tmpfs,destination=/app \
            $(DOCKERHUB_ID)/$(SERVICE_NAME)_$(ARCH):$(SERVICE_VERSION) /bin/bash
 
 # =============================================================================
