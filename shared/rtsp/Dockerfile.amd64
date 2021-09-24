@@ -1,0 +1,14 @@
+FROM ubuntu:bionic
+
+RUN apt-get update && apt-get install -q -y --no-install-recommends \
+  ffmpeg \
+  socat \
+  curl \
+  jq \
+  && rm -rf /var/lib/apt/lists/*
+
+COPY mock.jpg /
+COPY start.sh /
+COPY cam.sh /
+WORKDIR /
+CMD ["./start.sh"]
