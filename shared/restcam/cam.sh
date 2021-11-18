@@ -7,7 +7,7 @@ if [ -z "${CAM_OUT_WIDTH:-}" ]; then CAM_OUT_WIDTH=640; fi
 if [ -z "${CAM_OUT_HEIGHT:-}" ]; then CAM_OUT_HEIGHT=480; fi
 
 # Files (@@@ these should all be just in RAM)
-JPG="/tmp/cam.jpg"
+JPG="/app/cam.jpg"
 SCALE="${CAM_OUT_WIDTH}x${CAM_OUT_HEIGHT}"
 
 # Use this static image if anything goes wrong
