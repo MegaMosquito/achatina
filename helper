@@ -9,7 +9,7 @@
 # ./helper -i
 #   - returns an IP address on the first default interface for this host
 # ./helper -n
-#   - returns a name for this node (typiically `hostname`)
+#   - returns a name for this node (typically `hostname`)
 # ./helper -z
 #   - returns all of the above (really just for development convenience)
 #
@@ -107,7 +107,7 @@ while getopts ":aginz" opt; do
       show_ip;
       exit 0;
       ;;
-    \? ) echo "Usage: $0 [-a|-g|-i|-z]"
+    \? ) echo "Usage: $0 [-a|-g|-i|-n|-z]"
       ;;
   esac
 done
