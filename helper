@@ -105,6 +105,8 @@ while getopts ":aginz" opt; do
       show_gateway;
       echo -n "IP Address:             ";
       show_ip;
+      echo -n "Name:                   ";
+      show_name;
       exit 0;
       ;;
     \? ) echo "Usage: $0 [-a|-g|-i|-n|-z]"
