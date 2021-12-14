@@ -17,7 +17,6 @@ The enclosed documentation gives a high level overview for the architecture, and
 ├── helper .................... the small bash utility I mentioned above
 │
 ├── achatina
-│   ├── README.md ............. info for the top level program (needs a plugin)
 │   ├── Makefile .............. builds this container -- lots of docs in here!
 │   ├── Dockerfile.* .......... alpine-based + mqtt, kafka, python requests
 │   └── achatina.py ........... 142 lines (more than half to consume config)
