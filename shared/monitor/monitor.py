@@ -30,17 +30,6 @@ if __name__ == '__main__':
   webapp = Flask('monitor')                             
   webapp.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
-  # Loop forever collecting object detection / classification data from MQTT
-  class DetectThread(threading.Thread):
-    def run(self):
-      global last_detect
-      # print("\nMQTT \"" + MQTT_DETECT_TOPIC + "\" topic monitor thread started!")
-      DETECT_COMMAND = MQTT_SUB_COMMAND + '-t ' + MQTT_DETECT_TOPIC
-      while True:
-        last_detect = subprocess.check_output(DETECT_COMMAND, shell=True)
-        # print("\n\nMessage received on detect topic...\n")
-        # print(last_detect)
-
   @webapp.route("/images/detect.jpg")
   def get_detect_image():
     if last_detect:
@@ -166,8 +155,19 @@ if __name__ == '__main__':
     r.headers['Cache-Control'] = 'public, max-age=0'
     return r
 
-  # Main program (instantiates and starts monitor thread and then web server)
-  monitor_detect = DetectThread()
+  # Loop forever collecting object detection / classification data from MQTT
+  def collect_data():
+    global last_detect
+    # print("\nMQTT \"" + MQTT_DETECT_TOPIC + "\" topic monitor thread started!")
+    DETECT_COMMAND = MQTT_SUB_COMMAND + '-t ' + MQTT_DETECT_TOPIC
+    while True:
+      last_detect = subprocess.check_output(DETECT_COMMAND, shell=True)
+      # print("\n\nMessage received on detect topic...\n")
+      # print(last_detect)
+
+  # Main program (starts monitor thread and then web server)
+  monitor_detect =  threading.Thread(target=collect_data)
   monitor_detect.start()
+
   webapp.run(host=FLASK_BIND_ADDRESS, port=FLASK_PORT)
 
