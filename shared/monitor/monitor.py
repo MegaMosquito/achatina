@@ -55,7 +55,7 @@ if __name__ == '__main__':
       now = datetime.now().strftime("%Y/%m/%d %-I:%M%p")
       return '{"error":"' + now + ' -- No data yet."}'
     j = json.loads(last_detect)
-    n = j['deviceid']
+    n = j['device-id']
     c = len(j['detect']['entities'])
     ct = j['detect']['camtime']
     it = j['detect']['time']

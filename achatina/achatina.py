@@ -106,9 +106,9 @@ if __name__ == '__main__':
       j['source'] = 'achatina (with plugin "' + ACHATINA_PLUGIN + '")'
       j['source-url'] = ACHATINA_URL
       if '' != NODE:
-        j['deviceid'] = NODE
+        j['device-id'] = NODE
       else:
-        j['deviceid'] = '** NO DEVICE ID ** KAFKA PUBLISHING DISABLED **'
+        j['device-id'] = '** NO DEVICE ID ** KAFKA PUBLISHING DISABLED **'
 
       # Push JSON to a file (so we can publish it, since it overflows the CLI)
       with open(TEMP_FILE, 'w') as temp_file:
