@@ -62,11 +62,10 @@ if __name__ == '__main__':
     s = j['source']
     u = j['source-url']
     # print(s, u)
-    kafka_msg = '<p> &nbsp; <em>NOTE:</em> Nothing is being published to Kafka!</p>\n'
+    kafka_msg = ' Nothing is being published to Kafka!\n'
     if 'kafka-sub' in j:
       sub = j['kafka-sub']
-      kafka_msg = '<p> &nbsp; <em>NOTE:</em> This data is also being published to EventStreams (kafka). Subscribe with:</p>\n' + \
-        '<p style="font-family:monospace;">' + sub + '</p>\n'
+      kafka_msg = ' This data is also being published to EventStreams (kafka). Subscribe with: <p style="font-family:monospace;">' + sub + '</p>\n'
     OUT = \
       '<html>\n' + \
       ' <head>\n' + \
@@ -105,7 +104,7 @@ if __name__ == '__main__':
       '     <tr><td> &nbsp; </td></tr>\n' + \
       '     <tr>\n' + \
       '       <td>\n' + \
-      '         ' + kafka_msg + \
+      '         <p> &nbsp; <em>NOTE:</em>' + kafka_msg + '</p>\n' + \
       '       </td>\n' + \
       '     </tr>\n' + \
       '   </table>\n' + \
