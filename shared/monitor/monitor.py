@@ -89,7 +89,7 @@ if __name__ == '__main__':
       '     </tr>\n' + \
       '     <tr><td> &nbsp; </td></tr>\n' + \
       '     <tr>\n' + \
-      '       <td> &nbsp; Found entities in <span id="classes">' + str(c) + '</span> classes.</td>\n' + \
+      '       <td> &nbsp; Found entities in <span id="classes">' + str(c) + '</span> class(es).</td>\n' + \
       '     </tr>\n' + \
       '     <tr>\n' + \
       '       <td> &nbsp; Camera time: <span id="camtime">' + str(ct) + '</span> seconds.</td>\n' + \
