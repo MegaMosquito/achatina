@@ -309,7 +309,7 @@ if __name__ == '__main__':
     detect_data['tool'] = 'openvino'
     detect_data['date'] = int(time.time())
     detect_data['camtime'] = round(cam_end - cam_start, 3)
-    detect_data['time'] = round(prediction_end - prediction_start, 3)
+    detect_data['inf-time'] = round(prediction_end - prediction_start, 3)
     detect_data['entities'] = entity_data
     image_base64 = subprocess.check_output(['/usr/bin/base64 -w 0 -i ' + OUTGOING_IMAGE], shell=True, encoding='UTF-8')
     detect_data['image'] = image_base64

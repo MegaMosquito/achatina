@@ -58,7 +58,7 @@ if __name__ == '__main__':
     n = j['device-id']
     c = len(j['detect']['entities'])
     ct = j['detect']['camtime']
-    it = j['detect']['time']
+    it = j['detect']['inf-time']
     s = j['source']
     u = j['source-url']
     # print(s, u)
@@ -124,7 +124,7 @@ if __name__ == '__main__':
       '         var when = new Date(j.detect.date * 1000);\n' +\
       '         var c = j.detect.entities.length;\n' +\
       '         var ct = j.detect.camtime;\n' +\
-      '         var it = j.detect.time;\n' +\
+      '         var it = j.detect.inf-time;\n' +\
       '         d_date.innerHTML = when;\n' +\
       '         d_classes.innerHTML = c;\n' +\
       '         d_camtime.innerHTML = ct;\n' +\

@@ -332,7 +332,7 @@ if __name__ == "__main__":
     detect_data['tool'] = 'cpu-only'
     detect_data['date'] = int(time.time())
     detect_data['camtime'] = round(cam_end - cam_start, 3)
-    detect_data['time'] = round(prediction_end - prediction_start, 3)
+    detect_data['inf-time'] = round(prediction_end - prediction_start, 3)
     detect_data['entities'] = entity_data
     detect_data['image'] = prediction_image_b64
     data['detect'] = detect_data

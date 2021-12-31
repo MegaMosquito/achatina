@@ -100,7 +100,7 @@ if __name__ == '__main__':
       j = r.json()
       if LOG_DETAIL or LOG_STATS:
         d = datetime.fromtimestamp(j['detect']['date']).strftime('%Y-%m-%d %H:%M:%S')
-        print('Date: %s, Cam: %0.2f sec, Yolo: %0.2f msec.' % (d, j['detect']['camtime'], j['detect']['time'] * 1000.0))
+        print('Date: %s, Cam: %0.2f sec, Yolo: %0.2f msec.' % (d, j['detect']['camtime'], j['detect']['inf-time'] * 1000.0))
 
       # Add info into the JSON about this example
       j['source'] = 'achatina (with plugin "' + ACHATINA_PLUGIN + '")'
