@@ -123,8 +123,8 @@ if __name__ == '__main__':
       '         const j = await response.json();\n' + \
       '         var when = new Date(j.detect.date * 1000);\n' +\
       '         var c = j.detect.entities.length;\n' +\
-      '         var ct = j.detect.cam-time;\n' +\
-      '         var it = j.detect.inf-time;\n' +\
+      '         var ct = j["detect"]["cam-time"];\n' +\
+      '         var it = j["detect"]["inf-time"];\n' +\
       '         d_date.innerHTML = when;\n' +\
       '         d_classes.innerHTML = c;\n' +\
       '         d_camtime.innerHTML = ct;\n' +\
