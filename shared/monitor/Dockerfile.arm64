@@ -10,6 +10,7 @@ COPY *.jpg /
 
 # Copy over the source
 COPY monitor.py /
+COPY templates/*.html /templates/
 WORKDIR /
 
 # Run the daemon
