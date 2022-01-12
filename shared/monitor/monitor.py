@@ -27,6 +27,7 @@ if __name__ == '__main__':
   from io import BytesIO
   from flask import Flask
   from flask import send_file
+  from flask import render_template
   webapp = Flask('monitor')                             
   webapp.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
@@ -66,84 +67,7 @@ if __name__ == '__main__':
     if 'kafka-sub' in j:
       sub = j['kafka-sub']
       kafka_msg = ' This data is also being published to EventStreams (kafka). Subscribe with: <p style="font-family:monospace;">' + sub + '</p>\n'
-    OUT = \
-      '<html>\n' + \
-      ' <head>\n' + \
-      '   <title>achatina monitor</title>\n' + \
-      '   <style>body { width: 650px; }</style>\n' + \
-      ' </head>\n' + \
-      ' <body>\n' + \
-      '   <div>\n' + \
-      '   <table>\n' + \
-      '     <tr>\n' + \
-      '       <th><h2 style="color:blue;">' + s + '</h2></th>\n' + \
-      '     </tr>\n' + \
-      '     <tr>\n' + \
-      '       <th>Device ID: ' + n + '</th>\n' + \
-      '     </tr>\n' + \
-      '     <tr>\n' + \
-      '       <th><span id="when">&nbsp;</span></th>\n' + \
-      '     </tr>\n' + \
-      '     <tr>\n' + \
-      '       <td><img id="detect" height="480px" width="640px" src="/images/detect.jpg" alt="Prediction Image" /></td>\n' + \
-      '     </tr>\n' + \
-      '     <tr><td> &nbsp; </td></tr>\n' + \
-      '     <tr>\n' + \
-      '       <td> &nbsp; Found entities in <span id="classes">' + str(c) + '</span> class(es).</td>\n' + \
-      '     </tr>\n' + \
-      '     <tr>\n' + \
-      '       <td> &nbsp; Camera time: <span id="camtime">' + str(ct) + '</span> seconds.</td>\n' + \
-      '     </tr>\n' + \
-      '     <tr>\n' + \
-      '       <td> &nbsp; Inferencing time: <span id="inftime" style="font-weight:bold;color:blue;">' + str(it) + '</span> seconds.</td>\n' + \
-      '     </tr>\n' + \
-      '     <tr><td> &nbsp; </td></tr>\n' + \
-      '     <tr>\n' + \
-      '       <td> &nbsp; More information: <a href="' + u + '">' + u + '</a></td>\n' + \
-      '     </tr>\n' + \
-      '     <tr><td> &nbsp; </td></tr>\n' + \
-      '     <tr>\n' + \
-      '       <td>\n' + \
-      '         <p> &nbsp; <em>NOTE:</em>' + kafka_msg + '</p>\n' + \
-      '       </td>\n' + \
-      '     </tr>\n' + \
-      '   </table>\n' + \
-      '   </div>\n' + \
-      '   <script>\n' + \
-      '     function refresh(d_image, d_date, d_classes, d_camtime, d_inftime) {\n' + \
-      '       var t = 500;\n' + \
-      '       (async function startRefresh() {\n' + \
-      '         var address;\n' + \
-      '         if(d_image.src.indexOf("?")>-1)\n' + \
-      '           address = d_image.src.split("?")[0];\n' + \
-      '         else\n' + \
-      '           address = d_image.src;\n' + \
-      '         d_image.src = address+"?time="+new Date().getTime();\n' + \
-      '         const response = await fetch("/json");\n' + \
-      '         const j = await response.json();\n' + \
-      '         var when = new Date(j.detect.date * 1000);\n' +\
-      '         var c = j.detect.entities.length;\n' +\
-      '         var ct = j["detect"]["cam-time"];\n' +\
-      '         var it = j["detect"]["inf-time"];\n' +\
-      '         d_date.innerHTML = when;\n' +\
-      '         d_classes.innerHTML = c;\n' +\
-      '         d_camtime.innerHTML = ct;\n' +\
-      '         d_inftime.innerHTML = it;\n' +\
-      '         setTimeout(startRefresh, t);\n' + \
-      '       })();\n' + \
-      '     }\n' + \
-      '     window.onload = function() {\n' + \
-      '       var d_image = document.getElementById("detect");\n' + \
-      '       var d_date = document.getElementById("when");\n' + \
-      '       var d_classes = document.getElementById("classes");\n' + \
-      '       var d_camtime = document.getElementById("camtime");\n' + \
-      '       var d_inftime = document.getElementById("inftime");\n' + \
-      '       refresh(d_image, d_date, d_classes, d_camtime, d_inftime);\n' + \
-      '     }\n' + \
-      '   </script>\n' + \
-      ' </body>\n' + \
-      '</html>\n'
-    return (OUT)
+    return render_template("monitor.html", **locals())
 
   # Prevent caching everywhere
   @webapp.after_request
