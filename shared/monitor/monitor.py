@@ -67,7 +67,8 @@ if __name__ == '__main__':
     if 'kafka-sub' in j:
       sub = j['kafka-sub']
       kafka_msg = ' This data is also being published to EventStreams (kafka). Subscribe with: <p style="font-family:monospace;">' + sub + '</p>\n'
-    return render_template("monitor.html", **locals())
+    context = {'s': s, 'n': n, 'c': c, 'ct': ct, 'it': it, 'u': u, 'kafka_msg': kafka_msg }
+    return render_template("monitor.html", **context)
 
   # Prevent caching everywhere
   @webapp.after_request
