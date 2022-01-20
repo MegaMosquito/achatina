@@ -11,6 +11,7 @@ COPY *.jpg /
 # Copy over the source
 COPY monitor.py /
 COPY templates/*.html /templates/
+COPY static/*.js /static/
 WORKDIR /
 
 # Run the daemon
