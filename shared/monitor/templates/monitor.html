@@ -42,37 +42,6 @@
      </tr>
    </table>
    </div>
-   <script>
-     function refresh(d_image, d_date, d_classes, d_camtime, d_inftime) {
-       var t = 500; 
-       (async function startRefresh() {
-         var address;
-         if(d_image.src.indexOf("?")>-1)
-           address = d_image.src.split("?")[0];
-         else
-           address = d_image.src;
-         d_image.src = address+"?time="+new Date().getTime();
-         const response = await fetch("/json");
-         const j = await response.json();
-         var when = new Date(j.detect.date * 1000);
-         var c = j.detect.entities.length;
-         var ct = j["detect"]["cam-time"];
-         var it = j["detect"]["inf-time"];
-         d_date.innerHTML = when;
-         d_classes.innerHTML = c;
-         d_camtime.innerHTML = ct;
-         d_inftime.innerHTML = it;
-         setTimeout(startRefresh, t);
-       })();
-     }
-     window.onload = function() {
-       var d_image = document.getElementById("detect");
-       var d_date = document.getElementById("when");
-       var d_classes = document.getElementById("classes");
-       var d_camtime = document.getElementById("camtime");
-       var d_inftime = document.getElementById("inftime");
-       refresh(d_image, d_date, d_classes, d_camtime, d_inftime);
-     }
-   </script>
+   <script type=text/javascript src="{{ url_for('static', filename='refreshValues.js') }}"></script>
  </body>
 </html>
