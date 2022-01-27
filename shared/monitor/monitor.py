@@ -67,7 +67,8 @@ if __name__ == '__main__':
     if 'kafka-sub' in j:
       sub = j['kafka-sub']
       kafka_msg = ' This data is also being published to EventStreams (kafka). Subscribe with: <p style="font-family:monospace;">' + sub + '</p>\n'
-    context = {'s': s, 'n': n, 'c': c, 'ct': ct, 'it': it, 'u': u, 'kafka_msg': kafka_msg }
+    result_locals = locals()
+    context = dict((k, eval(k, result_locals)) for k in ('s', 'n', 'c', 'ct', 'it', 'u', 'kafka_msg'))
     return render_template("monitor.html", **context)
 
   # Prevent caching everywhere
