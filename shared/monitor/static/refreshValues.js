@@ -1,7 +1,6 @@
 function refresh(d_image, d_date, d_classes, d_camtime, d_inftime) {
  var t = 500;
  (async function startRefresh() {
-   var address;
    d_image.src = d_image.src.split("?")[0]+"?time="+new Date().getTime();
    const response = await fetch("/json");
    const j = await response.json();
