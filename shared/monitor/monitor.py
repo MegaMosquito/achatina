@@ -75,7 +75,8 @@ if __name__ == '__main__':
   def add_header(r):
     r.headers["Pragma"] = "no-cache"
     r.headers["Expires"] = "0"
-    r.headers["Cache-Control"] = "public, max-age=0"
+    r.cache_control.max_age = 0
+    r.cache_control.public = True
     return r
 
   # Loop forever collecting object detection / classification data from MQTT
