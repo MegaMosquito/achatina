@@ -13,10 +13,10 @@ RUN git clone https://github.com/pjreddie/darknet
 WORKDIR /darknet
 RUN make
 
-# Get YOLO cfg and weights files (using v2 for ARM32 because v3 now crashes)
+# Get YOLO cfg and weights files
 WORKDIR /darknet
-RUN wget -O yolo-tiny.cfg https://raw.githubusercontent.com/pjreddie/darknet/master/cfg/yolov2-tiny.cfg
-RUN wget -O yolo-tiny.weights https://pjreddie.com/media/files/yolov2-tiny.weights
+RUN wget -O yolo-tiny.cfg https://raw.githubusercontent.com/pjreddie/darknet/master/cfg/yolov3-tiny.cfg
+RUN wget -O yolo-tiny.weights https://pjreddie.com/media/files/yolov3-tiny.weights
 
 # Copy over the logo(s)
 COPY logo.png /
